@@ -3,7 +3,7 @@ from __future__ import print_function
 import copy
 import warnings
 import os
-os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
+#os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 import graphviz
 import matplotlib.pyplot as plt
 import numpy as np
