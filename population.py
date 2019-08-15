@@ -83,7 +83,10 @@ class Population(object):
         while n is None or k < n:
             k += 1
 
-            self.reporters.start_generation(self.generation)
+            if(self.generation % 50 == 0):
+                self.reporters.start_generation(self.generation)
+            
+            
 
             # Evaluate all genomes using the user-provided function.
             fitness_function(list(iteritems(self.population)), self.config)
@@ -93,7 +96,8 @@ class Population(object):
             for g in itervalues(self.population):
                 if best is None or g.fitness > best.fitness:
                     best = g
-            self.reporters.post_evaluate(self.config, self.population, self.species, best)
+            if(self.generation % 50 == 0):
+                self.reporters.post_evaluate(self.config, self.population, self.species, best)
 
             # Track the best genome ever seen.
             if self.best_genome is None or best.fitness > self.best_genome.fitness:
@@ -126,7 +130,10 @@ class Population(object):
             # Divide the new population into species.
             self.species.speciate(self.config, self.population, self.generation)
 
-            self.reporters.end_generation(self.config, self.population, self.species)
+            if(self.generation % 50 == 0):
+                self.reporters.end_generation(self.config, self.population, self.species)
+            
+            
 
             self.generation += 1
 

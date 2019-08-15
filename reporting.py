@@ -128,9 +128,9 @@ class StdOutReporter(BaseReporter):
         average = sum(self.generation_times) / len(self.generation_times)
         print('Total extinctions: {0:d}'.format(self.num_extinctions))
         if len(self.generation_times) > 1:
-            print("Generation time: {0:.3f} sec ({1:.3f} average)".format(elapsed, average))
+            print("Generation time: {0:.3f} sec ({1:.3f} average) \n\n".format(elapsed, average))
         else:
-            print("Generation time: {0:.3f} sec".format(elapsed))
+            print("Generation time: {0:.3f} sec \n\n".format(elapsed))
 
     def post_evaluate(self, config, population, species, best_genome):
         # pylint: disable=no-self-use
