@@ -20,7 +20,7 @@ class Checkpointer(BaseReporter):
     to save and restore populations (and other aspects of the simulation state).
     """
     def __init__(self, generation_interval=100, time_interval_seconds=300,
-                 filename_prefix='neat4-checkpoint-'):
+                 filename_prefix='test1-nobatch-config6'):
         """
         Saves the current state (at the end of a generation) every ``generation_interval`` generations or
         ``time_interval_seconds``, whichever happens first.
