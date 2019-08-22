@@ -71,11 +71,11 @@ def run(config_file):
                          config_file)
 
     # Create the population, which is the top-level object for a NEAT run.
-    #p = neat.Population(config)
+    p = neat.Population(config)
     
     #continue from last checkpoint
-    p = neat.Checkpointer.restore_checkpoint('test1-nobatch-config61700')
-
+    p = neat.Checkpointer.restore_checkpoint('test1-nobatch-config9-290',config)
+    #p = neat.Checkpointer.restore_checkpoint('test1-nobatch-config7-11084',config)
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -83,7 +83,7 @@ def run(config_file):
     p.add_reporter(neat.Checkpointer(50))
 
     # Run for up to 300 generations.
-    #winner = p.run(eval_genomes,10000)
+    #winner = p.run(eval_genomes,1)
 
     pe = neat.ParallelEvaluator(4,eval_genome)
     winner = p.run(pe.evaluate,1)
@@ -93,7 +93,7 @@ def run(config_file):
 
     # Show output of the most fit genome against training data.
     print('\nOutput:')
-    winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
+    winner_net = neat.nn.FeedForwardNetwork.create(winner,config)
     correct_predict = 0
     correct_winner = 0
     

@@ -286,14 +286,14 @@ class DefaultGenome(object):
                 self.mutate_add_node(config)
 
             if random() < config.node_delete_prob:
-                print("Here")
+                
                 self.mutate_delete_node(config)
 
             if random() < config.conn_add_prob:
                 self.mutate_add_connection(config)
 
             if random() < config.conn_delete_prob:
-                print("Here")
+                
                 self.mutate_delete_connection()
 
         # Mutate connection genes.
