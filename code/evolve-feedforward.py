@@ -14,7 +14,7 @@ xor_inputs = f=open("inputTest.txt","r")
 if(f.mode == 'r'):
     xor_inputs = eval(f.read())
 
-xor_outputs = f=open("outputTest.txt","r")
+xor_outputs = f=open("outputTest1.txt","r")
 if(f.mode == 'r'):
     xor_outputs = eval(f.read())
     
@@ -22,7 +22,7 @@ if(f.mode == 'r'):
 valid_inputs = f=open("validInputTest.txt","r")
 if(f.mode == 'r'):
     valid_inputs = eval(f.read())  
-valid_outputs = f=open("validOutputTest.txt","r")
+valid_outputs = f=open("validOutputTest1.txt","r")
 if(f.mode == 'r'):
     valid_outputs = eval(f.read())
 
@@ -74,8 +74,8 @@ def run(config_file):
     p = neat.Population(config)
     
     #continue from last checkpoint
-    p = neat.Checkpointer.restore_checkpoint('test1-nobatch-config9-290',config)
-    #p = neat.Checkpointer.restore_checkpoint('test1-nobatch-config7-11084',config)
+    p = neat.Checkpointer.restore_checkpoint('test1-config2-4990') # BEST SO FAR
+    #p = neat.Checkpointer.restore_checkpoint('result')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -86,41 +86,45 @@ def run(config_file):
     #winner = p.run(eval_genomes,1)
 
     pe = neat.ParallelEvaluator(4,eval_genome)
-    winner = p.run(pe.evaluate,1)
 
-    # Display the winning genome.
-    print('\nBest genome:\n{!s}'.format(winner))
+    for x in range(100):
+
+        winner = p.run(pe.evaluate,50)
+
+        # Display the winning genome.
+        print('\nBest genome:\n{!s}'.format(winner))
 
     # Show output of the most fit genome against training data.
-    print('\nOutput:')
-    winner_net = neat.nn.FeedForwardNetwork.create(winner,config)
-    correct_predict = 0
-    correct_winner = 0
-    
-    for xi, xo in zip(valid_inputs, valid_outputs):
+        print('\nOutput:')
+        winner_net = neat.nn.FeedForwardNetwork.create(winner,config)
+        correct_predict = 0
+        correct_winner = 0
         
-        output = winner_net.activate(xi)    
-        output[0] = round((output[0]*10))
-        output[1] = round((output[1]*10))
-        if(xo[0]*10 == output[0] and xo[1]*10 == output[1] ):
-            correct_predict += 1
-        if(xo[0]*10 > xo[1]*10 and output[0] > output[1] ):
-            correct_winner += 1
-        if(xo[0]*10 < xo[1]*10 and output[0] < output[1] ):
-            correct_winner += 1
-        if(xo[0]*10 == xo[1]*10 and output[0] == output[1] ):
-            correct_winner += 1
+        for xi, xo in zip(valid_inputs, valid_outputs):
+            
+            output = winner_net.activate(xi)    
+            output[0] = round((output[0]))
+            output[1] = round((output[1]))
+            if(xo[0] == output[0] and xo[1] == output[1] ):
+                correct_predict += 1
+            if(xo[0] > xo[1] and output[0] > output[1] ):
+                correct_winner += 1
+            if(xo[0] < xo[1] and output[0] < output[1] ):
+                correct_winner += 1
+            if(xo[0] == xo[1] and output[0] == output[1] ):
+                correct_winner += 1
 
+            
+            print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
         
-        print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
-    
-    print("Prediction accuracy = {!r} ".format(correct_predict))
-    print("Winner accuracy = {!r} ".format(correct_winner))
-    
-    node_names = {-1:'A', -2: 'B', 0:'A XOR B'}
+        print("Prediction accuracy = {!r} ".format(correct_predict))
+        print("Winner accuracy = {!r} ".format(correct_winner))
+        
+        node_names = {-1:'A', -2: 'B', 0:'A XOR B'}
+
     visualize.draw_net(config, winner, True, node_names=node_names)
-    visualize.plot_stats(stats, ylog=False, view=True)
-    visualize.plot_species(stats, view=True)
+    visualize.plot_stats(stats, ylog=False, view=False)
+    visualize.plot_species(stats, view=False)
 
     #p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     #p.run(eval_genomes, 10)

@@ -20,7 +20,7 @@ class Checkpointer(BaseReporter):
     to save and restore populations (and other aspects of the simulation state).
     """
     def __init__(self, generation_interval=100, time_interval_seconds=300,
-                 filename_prefix='test1-nobatch-config9-'):
+                 filename_prefix='test1-config2-'):
         """
         Saves the current state (at the end of a generation) every ``generation_interval`` generations or
         ``time_interval_seconds``, whichever happens first.
@@ -70,12 +70,9 @@ class Checkpointer(BaseReporter):
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     @staticmethod
-    def restore_checkpoint(filename, new_config = None):
+    def restore_checkpoint(filename):
         """Resumes the simulation from a previous saved point."""
         with gzip.open(filename) as f:
             generation, config, population, species_set, rndstate = pickle.load(f)
             random.setstate(rndstate)
-            if new_config is not None:
-                return Population(new_config, (population, species_set, generation))  
-            else:  
-                return Population(config, (population, species_set, generation))
+            return Population(config, (population, species_set, generation))
