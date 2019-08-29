@@ -10,7 +10,7 @@ import visualize
 import math
 
 # 2-input XOR inputs and expected outputs.
-xor_inputs = f=open("inputTest.txt","r")
+xor_inputs = f=open("inputTestWithTeam.txt","r")
 if(f.mode == 'r'):
     xor_inputs = eval(f.read())
 
@@ -19,7 +19,7 @@ if(f.mode == 'r'):
     xor_outputs = eval(f.read())
     
 
-valid_inputs = f=open("validInputTest.txt","r")
+valid_inputs = f=open("validInputTestWithTeam.txt","r")
 if(f.mode == 'r'):
     valid_inputs = eval(f.read())  
 valid_outputs = f=open("validOutputTest1.txt","r")
@@ -74,7 +74,7 @@ def run(config_file):
     p = neat.Population(config)
     
     #continue from last checkpoint
-    p = neat.Checkpointer.restore_checkpoint('test1-config2-4990') # BEST SO FAR
+    #p = neat.Checkpointer.restore_checkpoint('test1-config2-4990') # BEST SO FAR
     #p = neat.Checkpointer.restore_checkpoint('result')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
@@ -122,9 +122,10 @@ def run(config_file):
         
         node_names = {-1:'A', -2: 'B', 0:'A XOR B'}
 
-    visualize.draw_net(config, winner, True, node_names=node_names)
-    visualize.plot_stats(stats, ylog=False, view=False)
-    visualize.plot_species(stats, view=False)
+        visualize.draw_net(config, winner, view=False, node_names=node_names)
+        visualize.plot_stats(stats, ylog=False, view=False)
+        visualize.plot_species(stats, view=False)
+    
 
     #p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     #p.run(eval_genomes, 10)

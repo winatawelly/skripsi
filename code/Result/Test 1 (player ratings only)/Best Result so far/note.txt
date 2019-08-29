@@ -1,0 +1,2 @@
+Score accuracy = 125
+Winner accuracy = 300
