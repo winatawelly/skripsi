@@ -1,0 +1,2 @@
+prediction accuracry = 113
+Winner acc = 286
