@@ -7,6 +7,8 @@ import os
 import graphviz
 import matplotlib.pyplot as plt
 import numpy as np
+import json
+import collections
 
 
 def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
@@ -131,6 +133,19 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
         node_colors = {}
 
     assert type(node_colors) is dict
+
+    node_dict = dict()
+    node_obj = []
+    for i in genome.nodes:
+        node_dict = collections.defaultdict(dict) # create new instance of data structure
+        node_dict['key'] = genome.nodes[i].key
+        node_dict['bias'] = genome.nodes[i].bias
+        node_dict['activation'] = genome.nodes[i].activation
+        node_obj.append(node_dict)
+
+    with open('node_data.json', 'w') as outfile:
+    json.dump(node_obj, outfile)
+
 
     node_attrs = {
         'shape': 'circle',

@@ -8,6 +8,7 @@ import os
 import neat
 import visualize
 import math
+import json
 
 # 2-input XOR inputs and expected outputs.
 xor_inputs = f=open("inputTestWithTeam.txt","r")
@@ -75,7 +76,7 @@ def run(config_file):
     
     #continue from last checkpoint
     #p = neat.Checkpointer.restore_checkpoint('test1-config2-4990') # BEST SO FAR
-    #p = neat.Checkpointer.restore_checkpoint('result')
+    p = neat.Checkpointer.restore_checkpoint('test2-result')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -87,9 +88,9 @@ def run(config_file):
 
     pe = neat.ParallelEvaluator(4,eval_genome)
 
-    for x in range(100):
+    for x in range(1):
 
-        winner = p.run(pe.evaluate,50)
+        winner = p.run(pe.evaluate,1)
 
         # Display the winning genome.
         print('\nBest genome:\n{!s}'.format(winner))
@@ -97,6 +98,7 @@ def run(config_file):
     # Show output of the most fit genome against training data.
         print('\nOutput:')
         winner_net = neat.nn.FeedForwardNetwork.create(winner,config)
+    
         correct_predict = 0
         correct_winner = 0
         
@@ -115,7 +117,7 @@ def run(config_file):
                 correct_winner += 1
 
             
-            print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
+            #print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
         
         print("Prediction accuracy = {!r} ".format(correct_predict))
         print("Winner accuracy = {!r} ".format(correct_winner))
@@ -136,5 +138,5 @@ if __name__ == '__main__':
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config-feedforward')
+    config_path = os.path.join(local_dir, 'test2-config')
     run(config_path)
