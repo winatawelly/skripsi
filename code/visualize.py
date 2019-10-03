@@ -136,15 +136,52 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
 
     node_dict = dict()
     node_obj = []
-    for i in genome.nodes:
+    
+    ## put input nodes to json file for backprop
+    for k in config.genome_config.input_keys:
         node_dict = collections.defaultdict(dict) # create new instance of data structure
-        node_dict['key'] = genome.nodes[i].key
-        node_dict['bias'] = genome.nodes[i].bias
-        node_dict['activation'] = genome.nodes[i].activation
+        node_dict['key'] = k
+        node_dict['bias'] = 0
+        node_dict['activation'] = ''
+        node_dict['type'] = 'input'
         node_obj.append(node_dict)
 
+    ## put hidden nodes to json file for backprop
+    for i in genome.nodes:
+        node_dict = collections.defaultdict(dict) # create new instance of data structure
+        if genome.nodes[i].key > 1 :
+            node_dict['key'] = genome.nodes[i].key
+            node_dict['bias'] = genome.nodes[i].bias
+            node_dict['activation'] = genome.nodes[i].activation
+            node_dict['type'] = 'hidden'
+            node_obj.append(node_dict)
+
+    ## put output nodes to json file for backprop (output nodes id are 0 and 1)
+    for i in genome.nodes:
+        node_dict = collections.defaultdict(dict) # create new instance of data structure
+        if genome.nodes[i].key == 1 or genome.nodes[i].key == 0:
+            node_dict['key'] = genome.nodes[i].key
+            node_dict['bias'] = genome.nodes[i].bias
+            node_dict['activation'] = genome.nodes[i].activation
+            node_dict['type'] = 'output'
+            node_obj.append(node_dict)
+    
     with open('node_data.json', 'w') as outfile:
-    json.dump(node_obj, outfile)
+        json.dump(node_obj, outfile)
+
+    conn_dict = dict()
+    conn_obj = []
+    for i in genome.connections:
+        if genome.connections[i].enabled == True:
+            conn_dict = collections.defaultdict(dict)
+            conn_dict['from'] = genome.connections[i].key[0]
+            conn_dict['to'] = genome.connections[i].key[1]
+            conn_dict['weight'] = genome.connections[i].weight
+            conn_obj.append(conn_dict)
+        
+
+    with open('conn_data.json', 'w') as outfile:
+        json.dump(conn_obj, outfile)
 
 
     node_attrs = {

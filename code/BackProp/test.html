@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
+
+    <script src="https://rawgit.com/wagenaartje/neataptic/master/dist/neataptic.js"></script>
+    <script src="https://rawgit.com/wagenaartje/neataptic/master/graph/graph.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://rawgit.com/wagenaartje/neataptic/master/graph/graph.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <svg class="draw" width="1000px" height="1000px"></svg>
+      </div>
+    </div>
+    <script>
+        const {Node , architect} = neataptic
+    
+
+        var A = new Node();
+        var B = new Node();
+        var C = new Node();
+        var D = new Node();
+        var E = new Node();
+        var F = new Node();
+
+        var nodes = [A, B, C, D, E, F];
+
+        for(var i = 0; i < nodes.length-1; i++){
+        node = nodes[i];
+        for(var j = 0; j < 2; j++){
+            var connectTo = nodes[Math.floor(Math.random() * (nodes.length - i) + i)];
+            node.connect(connectTo);
+            }
+        }
+
+        var network = architect.Construct(nodes);
+        drawGraph(network.graph(300, 300), '.draw');
+        console.log(network.graph(300,300))
+
+    </script>
+  </body>
+</html>

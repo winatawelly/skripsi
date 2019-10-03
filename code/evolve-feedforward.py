@@ -104,9 +104,10 @@ def run(config_file):
         
         for xi, xo in zip(valid_inputs, valid_outputs):
             
-            output = winner_net.activate(xi)    
+            output = winner_net.activate(xi)
             output[0] = round((output[0]))
-            output[1] = round((output[1]))
+            output[1] = round((output[1]))    
+            
             if(xo[0] == output[0] and xo[1] == output[1] ):
                 correct_predict += 1
             if(xo[0] > xo[1] and output[0] > output[1] ):
@@ -117,7 +118,7 @@ def run(config_file):
                 correct_winner += 1
 
             
-            #print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
+            print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
         
         print("Prediction accuracy = {!r} ".format(correct_predict))
         print("Winner accuracy = {!r} ".format(correct_winner))
