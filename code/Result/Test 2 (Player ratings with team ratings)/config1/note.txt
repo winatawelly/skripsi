@@ -1,1 +1,7 @@
-bit better than player ratings only
+a little bit better than player ratings only
+
+this config also disabled the network ability to remove connection and remove node, similar to test1-config2
+
+Prediction accuracy = 136 
+Winner accuracy = 302 
+

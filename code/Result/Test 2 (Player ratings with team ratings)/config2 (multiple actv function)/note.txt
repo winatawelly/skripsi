@@ -1,0 +1,4 @@
+this config allows individual network to have more than 1 activation function, such as sigmoid, relu, and softplus. however, the result is worse than test2-config1
+
+Prediction accuracy = 113 
+Winner accuracy = 286 

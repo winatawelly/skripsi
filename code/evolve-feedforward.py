@@ -10,8 +10,44 @@ import visualize
 import math
 import json
 
-# 2-input XOR inputs and expected outputs.
-xor_inputs = f=open("inputTestWithTeam.txt","r")
+# file config for player rating only 
+# xor_inputs = f=open("inputTest.txt","r")
+# if(f.mode == 'r'):
+#     xor_inputs = eval(f.read())
+
+# xor_outputs = f=open("outputTest1.txt","r")
+# if(f.mode == 'r'):
+#     xor_outputs = eval(f.read())
+    
+
+# valid_inputs = f=open("validInputTest.txt","r")
+# if(f.mode == 'r'):
+#     valid_inputs = eval(f.read())  
+# valid_outputs = f=open("validOutputTest1.txt","r")
+# if(f.mode == 'r'):
+#     valid_outputs = eval(f.read())
+######################################## 
+
+# file config for test2 (player ratings with team)
+# xor_inputs = f=open("inputTestWithTeam.txt","r")
+# if(f.mode == 'r'):
+#     xor_inputs = eval(f.read())
+
+# xor_outputs = f=open("outputTest1.txt","r")
+# if(f.mode == 'r'):
+#     xor_outputs = eval(f.read())
+    
+
+# valid_inputs = f=open("validInputTestWithTeam.txt","r")
+# if(f.mode == 'r'):
+#     valid_inputs = eval(f.read())  
+# valid_outputs = f=open("validOutputTest1.txt","r")
+# if(f.mode == 'r'):
+#     valid_outputs = eval(f.read())
+####################################
+
+# file config for test3 (player ratings with team and position)
+xor_inputs = f=open("inputTestWithPos.txt","r")
 if(f.mode == 'r'):
     xor_inputs = eval(f.read())
 
@@ -20,13 +56,13 @@ if(f.mode == 'r'):
     xor_outputs = eval(f.read())
     
 
-valid_inputs = f=open("validInputTestWithTeam.txt","r")
+valid_inputs = f=open("validInputWithPos.txt","r")
 if(f.mode == 'r'):
     valid_inputs = eval(f.read())  
 valid_outputs = f=open("validOutputTest1.txt","r")
 if(f.mode == 'r'):
     valid_outputs = eval(f.read())
-
+######################################
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -75,8 +111,8 @@ def run(config_file):
     p = neat.Population(config)
     
     #continue from last checkpoint
-    #p = neat.Checkpointer.restore_checkpoint('test1-config2-4990') # BEST SO FAR
-    p = neat.Checkpointer.restore_checkpoint('test2-result')
+    #p = neat.Checkpointer.restore_checkpoint('test2-result-config3') # BEST SO FAR
+    #p = neat.Checkpointer.restore_checkpoint('test2-result-config2')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -88,9 +124,9 @@ def run(config_file):
 
     pe = neat.ParallelEvaluator(4,eval_genome)
 
-    for x in range(1):
+    for x in range(100):
 
-        winner = p.run(pe.evaluate,1)
+        winner = p.run(pe.evaluate,50)
 
         # Display the winning genome.
         print('\nBest genome:\n{!s}'.format(winner))
@@ -139,5 +175,5 @@ if __name__ == '__main__':
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'test2-config')
+    config_path = os.path.join(local_dir, 'test3-config1')
     run(config_path)

@@ -1,0 +1,4 @@
+this config disabled the ability to remove connection and remove node, allowing the network to grow faster. this config achieved better result than the previous, but the training time becomes soooo much longer
+
+Score accuracy = 125
+Winner accuracy = 300
