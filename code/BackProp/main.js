@@ -17,9 +17,7 @@ let count = 0;
 for(i in node_data){
     count++;
 }
-
 let nodes = Array(count);
-
 for(let i = 0 ; i < nodes.length ; i++){
     if(node_data[i].bias == 0){
         nodes[i] = new Node('input', node_data[i].key , 0);
@@ -28,5 +26,3 @@ for(let i = 0 ; i < nodes.length ; i++){
     }
 }
 */
-
-
