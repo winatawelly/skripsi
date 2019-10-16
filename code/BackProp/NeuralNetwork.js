@@ -4,22 +4,34 @@ const fs = require("fs");
 
 class NeuralNetwork{
 
-    constructor(node_json , conn_json){
-        
+    constructor(node_json , conn_json , type){
+        this.prepareData(type);
         this.build(node_json , conn_json);
+    }
+
+    prepareData(type){
+        if(type == 1){
+            this.trainingData = fs.readFileSync('./dataset/inputTestPlayerOnly.json');
+            this.validData = fs.readFileSync('./dataset/validTestPlayerOnly.json');
+        }else if(type == 2){
+            this.trainingData = fs.readFileSync('./dataset/inputTestWithTeam.json');
+            this.validData = fs.readFileSync('./dataset/validTestWithTeam.json');
+        }else if(type == 3){
+            this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPos.json');
+            this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPos.json');
+        }else{
+            console.log("unknown type");
+        }   
     }
 
     backprop(){
         let propagate = true;
-        let contents = fs.readFileSync("inputTestWithTeam.json");
-        //let contents = fs.readFileSync("validTestWithTeam.json");
-        //let contents = fs.readFileSync("test.json");
-        let input = JSON.parse(contents)
+        let input = JSON.parse(this.trainingData)
         let opt = {
             log: 100,
             error: 0,
             iterations: 100000,
-            rate: 0.00001,
+            rate: 0.001,
             
         }
         this.network.train(input,opt,propagate);
@@ -28,10 +40,7 @@ class NeuralNetwork{
 
     valid(){
         let propagate = false;
-        //let contents = fs.readFileSync("inputTestWithTeam.json");
-        let contents = fs.readFileSync("validTestWithTeam.json");
-        //let contents = fs.readFileSync("test.json");
-        let input = JSON.parse(contents)
+        let input = JSON.parse(this.validData)
         let opt = {
             log: 1,
             error: 0,

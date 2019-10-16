@@ -1,0 +1,87 @@
+Test 1:
+    - Parameters :
+        - 22 player ratings (11 from each team)
+
+    - Config 1
+        - Default Config
+        - Fitness function used (fitness function 1) :
+            def eval_genomes1(genomes, config):
+            for genome_id, genome in genomes:
+                genome.fitness = 0
+                net = neat.nn.FeedForwardNetwork.create(genome, config)
+                for xi, xo in zip(xor_inputs, xor_outputs):
+                    output = net.activate(xi)
+                    output[0] = round((output[0]*10))
+                    output[1] = round((output[1]*10))
+                    if(xo[0]*10 == output[0] and xo[1]*10 == output[1] ):
+                        genome.fitness += 1
+                    else :
+                        if(xo[0]*10 > xo[1]*10 and output[0] > output[1] ):
+                            genome.fitness += 0.5
+                        if(xo[0]*10 < xo[1]*10 and output[0] < output[1] ):
+                            genome.fitness += 0.5
+                        if(xo[0]*10 == xo[1]*10 and output[0] == output[1] ):
+                            genome.fitness += 0.5
+        - This fitness function gives 1 point if the output produced by network is correct, and 0.5 if the output is wrong but the result is correct
+        - 
+    
+    - Config 2
+        - Default config
+        - Fitness function is changed to fitness function 2 :
+            def eval_genomes(genomes, config):
+            for genome_id, genome in genomes:
+                genome.fitness = 1140
+                net = neat.nn.FeedForwardNetwork.create(genome, config)
+                for xi, xo in zip(xor_inputs, xor_outputs):
+                    output = net.activate(xi)
+                    genome.fitness -= (output[0] - xo[0]) ** 2
+                    genome.fitness -= (output[1] - xo[1]) ** 2
+        - This fitness function evaluates the fitness score by doing sum of squared error
+        - Result :
+            - Prediction accuracy = 85 (22%)
+            - Winner Accuray = 273  (71%)
+        - Summary :
+            this fitness function achieved better result than the previous experiment, however the best network doesn't seem to evolve further
+
+    - Config 3
+        - This config disabled the network abilities to remove connection and remove node, allowing population to grow faster
+        - Fitness function 2
+        - Result :
+            - Score accuracy = 125 (32%)
+            - Winner accuracy = 300 (78%)
+        - Summary :
+            - This config achieved better result than the previous experiment, but the training time is significantly longer
+        
+Test 2:
+    - Parameters
+        - 22 player ratings (11 from each team) plus 2 team ratings, total = 24
+
+    Config 1:
+        - Same config as Test1-Config3
+        - Fitness function 2
+        - Result
+            - Prediction accuracy = 136 (35%)
+            - Winner accuracy = 302 (79%)
+        - Summary :
+            2 newly added parameters slightly improve the result
+
+    Config 2:
+        - This config allowed each network to have more than 1 activation function, such as relu, sigmoid, and softmax (in all previous tests, each netowrk can only have 1 activation, which is relu)
+        - Fitness function 2
+        - Result
+            - Prediction accuracy = 113 (30%)
+            - Winner accuracy = 286 (75%)
+        - Summary :
+            - Multiple activation function turned out to be bad, the result is worse than single activation function
+        
+    Config 3:
+        - Becuase there is no improvement from previous test, this config go back to single activation function, but the probability to mutate is bumped to 0.8 from 0,5 in hope the population can grow even faster
+        - Fitness function 2
+        - Result
+            - Prediction accuracy = 136 (35%)
+            - Winner accuracy = 305 (80%)
+        - Summary :
+            - sligly better than config 1 
+
+
+

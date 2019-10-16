@@ -4,7 +4,7 @@
 const NeuralNetwork = require('./NeuralNetwork.js');
 
 
-let nn = new NeuralNetwork("node_data1.json" , "conn_data.json");
+let nn = new NeuralNetwork("./config/node-test2-config1.json" , "./config/conn-test2-config1.json" , 2);
 
 /*
 // Get content from file
