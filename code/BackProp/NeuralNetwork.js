@@ -7,9 +7,87 @@ class NeuralNetwork{
     constructor(node_json , conn_json , type){
         this.prepareData(type);
         this.build(node_json , conn_json);
+        //this.backprop(5000);
+        //this.valid();
+        //console.log(this.getRatings('David Silva'));
+        this.getTeamRating("asd")
+        //this.getPlayerRating("asd");    
+    }
+
+    realLifeTest(){
+        for(let matchId in this.datasetRealLife){
+            for(let teamId in this.datasetRealLife[matchId]){
+                for(let teamData in this.datasetRealLife[matchId][teamId]){
+                    if(teamData == 'Player_stats'){
+                        for(let player in this.datasetRealLife[matchId][teamId][teamData]){
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    getTeamRating(teamName){
+        let rating = 0;
+        let count = 0;
+        
+        for(let matchId in this.datasetRealLife){
+            
+        }
+        
+        
+        if(count > 0){
+            return rating/count;
+        }else{
+            return 6.0
+        }
+
+    }
+
+    getPlayerRating(playerName){
+        // console.log(this.dataset[1190174])
+        let rating = 0;
+        let count = 0;
+        for(let matchId in this.dataset){
+            for(let teamId in this.dataset[matchId]){
+                for(let teamData in this.dataset[matchId][teamId]){
+                    if(teamData == 'Player_stats'){
+                        for(let player in this.dataset[matchId][teamId][teamData]){
+                            if(player == playerName){
+                                for(let playerData in this.dataset[matchId][teamId][teamData][player]){
+                                    if(playerData == 'player_details'){
+                                        for(let stat in this.dataset[matchId][teamId][teamData][player][playerData]){
+                                            if(stat == 'player_rating'){
+                                                let prate = parseInt(this.dataset[matchId][teamId][teamData][player][playerData][stat]);
+                                                if(prate != 0){
+                                                    rating += prate
+                                                    count++;
+                                                }
+                                                
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if(count > 0){
+            return rating/count;
+        }else{
+            return 6.0
+        }
+
     }
 
     prepareData(type){
+        this.dataset = JSON.parse(fs.readFileSync('./dataset/dataset.json'));
+        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/datasetRealLife.json'))
         if(type == 1){
             this.trainingData = fs.readFileSync('./dataset/inputTestPlayerOnly.json');
             this.validData = fs.readFileSync('./dataset/validTestPlayerOnly.json');
@@ -24,13 +102,13 @@ class NeuralNetwork{
         }   
     }
 
-    backprop(){
+    backprop(iteration){
         let propagate = true;
         let input = JSON.parse(this.trainingData)
         let opt = {
             log: 100,
             error: 0,
-            iterations: 11000,
+            iterations: iteration,
             rate: 0.001,
             
         }
@@ -133,19 +211,7 @@ class NeuralNetwork{
 
        
         
-        this.network = architect.Construct(this.nodes);
-        let feature = [0.63107692307692, 0.633, 0.642, 0.592, 0.612, 0.691, 0.623, 0.657, 0.625, 0.667, 0.633, 0.586, 0.72376923076923, 0.662, 0.758, 0.741, 0.745, 0.692, 0.91, 0.764, 0.713, 0.716, 0.708, 0.764];
-        //this.predict(feature);
-        //this.backprop(false);
-        //this.predict(feature);
-        //this.valid();
-        this.backprop();
-        this.valid();
-
-
-        
-       
-        
+        this.network = architect.Construct(this.nodes);        
 
     }
 
