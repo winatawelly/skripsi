@@ -30,7 +30,7 @@ class NeuralNetwork{
         let opt = {
             log: 100,
             error: 0,
-            iterations: 100000,
+            iterations: 11000,
             rate: 0.001,
             
         }

@@ -20,7 +20,7 @@ class Checkpointer(BaseReporter):
     to save and restore populations (and other aspects of the simulation state).
     """
     def __init__(self, generation_interval=100, time_interval_seconds=300,
-                 filename_prefix='test3-config1-'):
+                 filename_prefix='test10-config1-'):
         """
         Saves the current state (at the end of a generation) every ``generation_interval`` generations or
         ``time_interval_seconds``, whichever happens first.

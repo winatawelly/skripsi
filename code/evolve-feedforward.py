@@ -11,21 +11,21 @@ import math
 import json
 
 # file config for player rating only 
-# xor_inputs = f=open("inputTest.txt","r")
-# if(f.mode == 'r'):
-#     xor_inputs = eval(f.read())
+xor_inputs = f=open("inputTest.txt","r")
+if(f.mode == 'r'):
+    xor_inputs = eval(f.read())
 
-# xor_outputs = f=open("outputTest1.txt","r")
-# if(f.mode == 'r'):
-#     xor_outputs = eval(f.read())
+xor_outputs = f=open("outputTest1.txt","r")
+if(f.mode == 'r'):
+    xor_outputs = eval(f.read())
     
 
-# valid_inputs = f=open("validInputTest.txt","r")
-# if(f.mode == 'r'):
-#     valid_inputs = eval(f.read())  
-# valid_outputs = f=open("validOutputTest1.txt","r")
-# if(f.mode == 'r'):
-#     valid_outputs = eval(f.read())
+valid_inputs = f=open("validInputTest.txt","r")
+if(f.mode == 'r'):
+    valid_inputs = eval(f.read())  
+valid_outputs = f=open("validOutputTest1.txt","r")
+if(f.mode == 'r'):
+    valid_outputs = eval(f.read())
 ######################################## 
 
 # file config for test2 (player ratings with team)
@@ -47,21 +47,21 @@ import json
 ####################################
 
 # file config for test3 (player ratings with team and position)
-xor_inputs = f=open("inputTestWithPos.txt","r")
-if(f.mode == 'r'):
-    xor_inputs = eval(f.read())
+# xor_inputs = f=open("inputTestWithPos.txt","r")
+# if(f.mode == 'r'):
+#     xor_inputs = eval(f.read())
 
-xor_outputs = f=open("outputTest1.txt","r")
-if(f.mode == 'r'):
-    xor_outputs = eval(f.read())
+# xor_outputs = f=open("outputTest1.txt","r")
+# if(f.mode == 'r'):
+#     xor_outputs = eval(f.read())
     
 
-valid_inputs = f=open("validInputWithPos.txt","r")
-if(f.mode == 'r'):
-    valid_inputs = eval(f.read())  
-valid_outputs = f=open("validOutputTest1.txt","r")
-if(f.mode == 'r'):
-    valid_outputs = eval(f.read())
+# valid_inputs = f=open("validInputWithPos.txt","r")
+# if(f.mode == 'r'):
+#     valid_inputs = eval(f.read())  
+# valid_outputs = f=open("validOutputTest1.txt","r")
+# if(f.mode == 'r'):
+#     valid_outputs = eval(f.read())
 ######################################
 
 def eval_genomes(genomes, config):
@@ -80,6 +80,24 @@ def eval_genome(genome, config):
         output = net.activate(xi)
         fitness -= (output[0] - xo[0]) ** 2
         fitness -= (output[1] - xo[1]) ** 2
+    return fitness
+
+def eval_genome2(genome, config):
+    fitness = 0
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    for xi, xo in zip(xor_inputs, xor_outputs):
+        output = net.activate(xi)
+        output[0] = round((output[0]*10))
+        output[1] = round((output[1]*10))
+        if(xo[0] == output[0] and xo[1] == output[1] ):
+            fitness += 1
+        else :
+            if(xo[0] > xo[1] and output[0] > output[1] ):
+                fitness += 0.5
+            if(xo[0] < xo[1] and output[0] < output[1] ):
+                fitness += 0.5
+            if(xo[0] == xo[1] and output[0] == output[1] ):
+                fitness += 0.5
     return fitness
 
 def eval_genomes1(genomes, config):
@@ -112,7 +130,7 @@ def run(config_file):
     
     #continue from last checkpoint
     #p = neat.Checkpointer.restore_checkpoint('test2-result-config3') # BEST SO FAR
-    #p = neat.Checkpointer.restore_checkpoint('test2-result-config2')
+    p = neat.Checkpointer.restore_checkpoint('test10-result')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -122,18 +140,18 @@ def run(config_file):
     # Run for up to 300 generations.
     #winner = p.run(eval_genomes,1)
 
-    pe = neat.ParallelEvaluator(4,eval_genome)
+    pe = neat.ParallelEvaluator(4,eval_genome2)
 
-    for x in range(100):
+    for x in range(1):
 
-        winner = p.run(pe.evaluate,50)
+        winner = p.run(pe.evaluate,1)
 
         # Display the winning genome.
         print('\nBest genome:\n{!s}'.format(winner))
 
     # Show output of the most fit genome against training data.
         print('\nOutput:')
-        winner_net = neat.nn.FeedForwardNetwork.create(winner,config)
+        winner_net = neat.nn.FeedForwardNetwork.create(winner,config , display=True)
     
         correct_predict = 0
         correct_winner = 0
@@ -154,7 +172,7 @@ def run(config_file):
                 correct_winner += 1
 
             
-            print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
+            ##print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
         
         print("Prediction accuracy = {!r} ".format(correct_predict))
         print("Winner accuracy = {!r} ".format(correct_winner))
@@ -175,5 +193,5 @@ if __name__ == '__main__':
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'test3-config1')
+    config_path = os.path.join(local_dir, 'test1-config1')
     run(config_path)
