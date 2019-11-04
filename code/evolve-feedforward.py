@@ -11,21 +11,21 @@ import math
 import json
 
 # file config for player rating only 
-xor_inputs = f=open("inputTest.txt","r")
-if(f.mode == 'r'):
-    xor_inputs = eval(f.read())
+# xor_inputs = f=open("inputTest.txt","r")
+# if(f.mode == 'r'):
+#     xor_inputs = eval(f.read())
 
-xor_outputs = f=open("outputTest1.txt","r")
-if(f.mode == 'r'):
-    xor_outputs = eval(f.read())
+# xor_outputs = f=open("outputTest1.txt","r")
+# if(f.mode == 'r'):
+#     xor_outputs = eval(f.read())
     
 
-valid_inputs = f=open("validInputTest.txt","r")
-if(f.mode == 'r'):
-    valid_inputs = eval(f.read())  
-valid_outputs = f=open("validOutputTest1.txt","r")
-if(f.mode == 'r'):
-    valid_outputs = eval(f.read())
+# valid_inputs = f=open("validInputTest.txt","r")
+# if(f.mode == 'r'):
+#     valid_inputs = eval(f.read())  
+# valid_outputs = f=open("validOutputTest1.txt","r")
+# if(f.mode == 'r'):
+#     valid_outputs = eval(f.read())
 ######################################## 
 
 # file config for test2 (player ratings with team)
@@ -47,6 +47,7 @@ if(f.mode == 'r'):
 ####################################
 
 # file config for test3 (player ratings with team and position)
+## Label Encoding
 # xor_inputs = f=open("inputTestWithPos.txt","r")
 # if(f.mode == 'r'):
 #     xor_inputs = eval(f.read())
@@ -63,6 +64,43 @@ if(f.mode == 'r'):
 # if(f.mode == 'r'):
 #     valid_outputs = eval(f.read())
 ######################################
+
+## One Hot
+xor_inputs = f=open("inputTestWithPosOneHot.txt","r")
+if(f.mode == 'r'):
+    xor_inputs = eval(f.read())
+
+xor_outputs = f=open("outputTest1.txt","r")
+if(f.mode == 'r'):
+    xor_outputs = eval(f.read())
+    
+
+valid_inputs = f=open("validInputWithPosOneHot.txt","r")
+if(f.mode == 'r'):
+    valid_inputs = eval(f.read())  
+valid_outputs = f=open("validOutputTest1.txt","r")
+if(f.mode == 'r'):
+    valid_outputs = eval(f.read())
+# ######################################
+
+# ## Binary
+# xor_inputs = f=open("inputTestWithPosBinary.txt","r")
+# if(f.mode == 'r'):
+#     xor_inputs = eval(f.read())
+
+# xor_outputs = f=open("outputTest1.txt","r")
+# if(f.mode == 'r'):
+#     xor_outputs = eval(f.read())
+    
+
+# valid_inputs = f=open("validInputWithPosBinary.txt","r")
+# if(f.mode == 'r'):
+#     valid_inputs = eval(f.read())  
+# valid_outputs = f=open("validOutputTest1.txt","r")
+# if(f.mode == 'r'):
+#     valid_outputs = eval(f.read())
+# ######################################
+
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -130,7 +168,7 @@ def run(config_file):
     
     #continue from last checkpoint
     #p = neat.Checkpointer.restore_checkpoint('test2-result-config3') # BEST SO FAR
-    p = neat.Checkpointer.restore_checkpoint('test10-result')
+    p = neat.Checkpointer.restore_checkpoint('test3-result-config1')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -140,7 +178,7 @@ def run(config_file):
     # Run for up to 300 generations.
     #winner = p.run(eval_genomes,1)
 
-    pe = neat.ParallelEvaluator(4,eval_genome2)
+    pe = neat.ParallelEvaluator(4,eval_genome)
 
     for x in range(1):
 
@@ -158,7 +196,7 @@ def run(config_file):
         
         for xi, xo in zip(valid_inputs, valid_outputs):
             
-            output = winner_net.activate(xi)
+            output = winner_net.activate(xi,'eval')
             output[0] = round((output[0]))
             output[1] = round((output[1]))    
             
@@ -172,14 +210,14 @@ def run(config_file):
                 correct_winner += 1
 
             
-            ##print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
+            print("input {!r}, expected output {!r}, got {!r}".format(xi, xo, output))
         
         print("Prediction accuracy = {!r} ".format(correct_predict))
         print("Winner accuracy = {!r} ".format(correct_winner))
         
         node_names = {-1:'A', -2: 'B', 0:'A XOR B'}
 
-        visualize.draw_net(config, winner, view=False, node_names=node_names)
+        visualize.draw_net(config, winner, view=False, node_names=node_names, name="test3-config1")
         visualize.plot_stats(stats, ylog=False, view=False)
         visualize.plot_species(stats, view=False)
     
@@ -193,5 +231,5 @@ if __name__ == '__main__':
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'test1-config1')
+    config_path = os.path.join(local_dir, 'test3-config1')
     run(config_path)

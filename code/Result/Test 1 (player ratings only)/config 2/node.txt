@@ -1,0 +1,4 @@
+first test with default config
+
+Prediction accuracy = 85
+Winner Accuray = 273

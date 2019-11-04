@@ -3,8 +3,10 @@
 // const fs = require("fs");
 const NeuralNetwork = require('./NeuralNetwork.js');
 
+//let nn = new NeuralNetwork("./config/test3-config1-node_data.json" , "./config/test3-config1-conn_data.json" , 3 , 'oneHot');
+let nn = new NeuralNetwork("./config/test3-config1-afterBackprop-node_data.json" , "./config/test3-config1-afterBackprop-conn_data.json" , 3 , 'oneHot');
+//let nn = new NeuralNetwork("./config/node-test2-config1.json" , "./config/conn-test2-config1.json" , 2);
 
-let nn = new NeuralNetwork("./config/node-test2-config1.json" , "./config/conn-test2-config1.json" , 2);
 
 /*
 // Get content from file

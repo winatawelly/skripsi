@@ -117,7 +117,7 @@ def plot_species(statistics, view=False, filename='speciation.svg'):
 
 
 def draw_net(config, genome, view=False, filename=None, node_names=None, show_disabled=True, prune_unused=False,
-             node_colors=None, fmt='svg'):
+             node_colors=None, fmt='svg', name=None):
     """ Receives a genome and draws a neural network with arbitrary topology. """
     # Attributes for network nodes.
     if graphviz is None:
@@ -166,7 +166,7 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
             node_dict['type'] = 'output'
             node_obj.append(node_dict)
     
-    with open('node_data.json', 'w') as outfile:
+    with open(name+'-node_data.json', 'w') as outfile:
         json.dump(node_obj, outfile)
 
     conn_dict = dict()
@@ -179,8 +179,8 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
             conn_dict['weight'] = genome.connections[i].weight
             conn_obj.append(conn_dict)
         
-
-    with open('conn_data.json', 'w') as outfile:
+    
+    with open(name+'-conn_data.json', 'w') as outfile:
         json.dump(conn_obj, outfile)
 
 
