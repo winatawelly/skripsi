@@ -5,12 +5,25 @@ const fs = require("fs");
 class NeuralNetwork{
 
     constructor(node_json , conn_json , type , encodingType){
+        this.depth = 5;
         this.prepareData(type , encodingType);
         this.build(node_json , conn_json);
-        this.valid();
-        this.backprop(100000);
-        this.valid();        
-        this.save("test3-config1--afterBackprop");
+        // this.valid();
+        // this.backprop(100000);
+        // this.valid();        
+        // this.save("test3-config1--afterBackprop");
+        //this.functoba();
+        //this.valid(this.datasetRealLife);
+        //this.valid();
+        // for(let i = 0 ; i < 1000 ; i++){
+        //     this.valid(this.datasetRealLife);
+        //     this.backprop(1000);
+        //     this.valid(this.datasetRealLife);
+        // }
+        
+        //this.functoba();
+        this.createDataset();
+        //this.valid();
         
     }
 
@@ -61,28 +74,71 @@ class NeuralNetwork{
     functoba(){
         let matchCount = 0;
         let teamList = [];
-        let datasetRealLife = this.datasetRealLife;
+        let notIncluded = [];
+        let tCount = 0;
+        let datasetRealLife = JSON.parse(fs.readFileSync('./dataset/datasetSorted.json'));
+        let matchDay = {};
 
-        for(let matchId in datasetRealLife){
-            if(matchCount > 100){
-                teamList.push(datasetRealLife[matchId]);
+      
+        //console.log("he");
+        let count = 0;
+        let temp;
+        for(let a = 0 ; a < 10000 ; a++){
+            let sorting = 0;
+            for(let i = 0 ; i < 379 ; i++){
+                let thisMatch = '_'+i;
+                let nextMatch = '_'+(i+1);
+                let thisDate;
+                let nextDate;
+
+                for(let teamId in datasetRealLife[thisMatch]){
+                    thisDate = datasetRealLife[thisMatch][teamId]['team_details']['date'];
+                }
+
+                for(let teamId in datasetRealLife[nextMatch]){
+                    nextDate = datasetRealLife[nextMatch][teamId]['team_details']['date'];
+                }
+                
+                nextDate = nextDate.replace(/\\/g, '');
+                thisDate = thisDate.replace(/\\/g, '');
+                thisDate = thisDate.split("/");
+                nextDate = nextDate.split("/");
+                
+                
+                
+                thisDate = new Date(thisDate[2] , thisDate[1] , thisDate[0]);
+                nextDate = new Date(nextDate[2] , nextDate[1] , nextDate[0]);
+                if(thisDate > nextDate){
+                    sorting++;
+                    console.log("sorting");
+                    let temp = datasetRealLife[thisMatch];
+                    datasetRealLife[thisMatch] = datasetRealLife[nextMatch];
+                    datasetRealLife[nextMatch] = temp;
+                }else{
+                }
             }
-            matchCount++;
-           
+            console.log(sorting);
+            if(sorting == 0){
+                break;
+            }
+            
         }
 
-
-        const jsonString = JSON.stringify(teamList)
-        fs.writeFile('./validationReal.json', jsonString, err => {
-            if (err) {
-                console.log('Error writing file', err)
-            } else {
-                console.log('Successfully wrote file')
+        for(let matchId in datasetRealLife){
+            for(let teamId in datasetRealLife[matchId]){
+                matchDay[datasetRealLife[matchId][teamId]['team_details']['team_name']] = 0;
             }
-        })
-            
-            
-        //console.log(teamCount)
+            console.log("\n");
+         }
+         for(let matchId in datasetRealLife){
+             for(let teamId in datasetRealLife[matchId]){
+                 matchDay[datasetRealLife[matchId][teamId]['team_details']['team_name']]++;
+                 datasetRealLife[matchId][teamId]['team_details']['matchday'] = matchDay[datasetRealLife[matchId][teamId]['team_details']['team_name']];
+             }
+             console.log("\n");
+         }
+         
+        this.writeJson(datasetRealLife,'./dataset/datasetFinale.json');
     }
 
     realLifeTest(){
@@ -90,35 +146,151 @@ class NeuralNetwork{
         this.valid(dataset);
     }
 
-    getPlayerRatingId(id){
-        let ratings = 0;
-        let dataCount = 0;
-        for(let matchId in this.dataset){
-            for(let teamId in this.dataset[matchId]){
-                for(let player in this.dataset[matchId][teamId]['Player_stats']){
-                    
-                   if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'] == id){
-                        console.log(player);
-                       if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'] != '0'){
-                        ratings += parseFloat(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'])
-                        dataCount++;
-                       }
-                   } 
+    getTeamRating(team , matchday){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
+        let sum = 0;
+        let count = 0;
+        for(let i = 379 ; i >= 0 ; i--){
+            let matchId = '_'+i;
+            for(let teamId in dataset[matchId]){
+                if(dataset[matchId][teamId]['team_details']['team_id'] == team && dataset[matchId][teamId]['team_details']['matchday'] < matchday){
+                    //console.log(dataset[matchId][teamId]['team_details']['team_rating'] , dataset[matchId][teamId]['team_details']['matchday']);
+                    sum += parseFloat(dataset[matchId][teamId]['team_details']['team_rating']);
+                    count++;
                 }
+            }
+            if(count == this.depth){
+                return (sum/count)/10;
+            }       
+        }
+        return (sum/count)/10;
+    }
 
+    getPlayerRating(playerId , matchday){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
+        let sum = 0;
+        let count = 0;
+        for(let i = 379 ; i >= 0 ; i--){
+            let matchId = '_'+i;
+            for(let teamId in dataset[matchId]){
+                if(dataset[matchId][teamId]['team_details']['matchday'] < matchday){
+                    for(let player in dataset[matchId][teamId]['Player_stats']){
+                        if(playerId == dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'] && dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
+                            //console.log(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_name'] , dataset[matchId][teamId]['team_details']['matchday'])
+                            sum+= parseFloat(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']);
+                            count++;
+                        }
+                    }
+                }
+                
+            }
+            if(count == this.depth){
+                return (sum/count)/10;
             }
         }
 
-        if(dataCount != 0){
-            return (ratings/dataCount)/10;
+        if(count == 0){
+            return 0.6
         }else{
-            this.emptyPlayer++;
-            return 0.6;
+            return (sum/count)/10;
         }
+        
 
-       
+    }
 
+    createDataset(){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
+        let input = [];
+        let output = [];
+        let obj = {};
+        let data = [];
+        let winner_correct = 0;
+        let prediction_correct = 0;
+        for(let matchId in dataset){
+            obj = {};
+            input = [];
+            output = [];
+            let matchday = 0;
+            let home = true;
+            for(let teamId in dataset[matchId]){
+                if(dataset[matchId][teamId]['team_details']['matchday'] > 5){
+                    matchday = dataset[matchId][teamId]['team_details']['matchday'];
+                    let team = dataset[matchId][teamId]['team_details']['team_id'];
+                    let teamRating = dataset[matchId][teamId]['team_details']['team_rating']/10;
+                    console.log(dataset[matchId][teamId]['team_details']['team_name']);
+                    if(home){
+                        let teamRating = this.getTeamRating(team,matchday);
+                        teamRating += 0.05;
+                        input.push(teamRating);
+                    }else{
+                        input.push(this.getTeamRating(team,matchday));
+                    }
+                    //input.push(teamRating);
+                    
 
+                    if(!dataset[matchId][teamId]['aggregate_stats'].hasOwnProperty('goals')){
+                        output.push(0);
+                    }else{
+                        output.push(dataset[matchId][teamId]['aggregate_stats']['goals']);
+                    }
+
+                    for(let player in dataset[matchId][teamId]['Player_stats']){
+                        if(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
+                            let playerId = dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'];
+                            if(home){
+                                let rating = this.getPlayerRating(playerId,matchday);
+                                //rating += 0.05;
+                                input.push(rating);
+                            }else{
+                                input.push(this.getPlayerRating(playerId,matchday));
+                            }
+
+                            // let playerRating = dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'] / 10;
+                            // input.push(playerRating);
+
+                            
+                            //console.log(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_name'] , this.getPlayerRating(playerId,matchday));
+                           
+                        }
+                        
+                    }
+                    home = false;
+                }
+                    
+            }
+            if(matchday > 5){
+                let result = this.predict(input);
+                result[0] = Math.round(result[0]);
+                result[1] = Math.round(result[1]);
+                console.log("result =",result,"real = ",output,"\n");
+                if(result[0] > result[1] && output[0] > output[1]){
+                    console.log("Winner Correct !",winner_correct);
+                    winner_correct++;
+                }else if(result[0] == result[1] && output[0] == output[1]){
+                    console.log("Winner Correct !",winner_correct);
+                    winner_correct++;
+                }else if(result[0] < result[1] && output[0] < output[1]){
+                    console.log("Winner Correct !",winner_correct);
+                    winner_correct++;
+                }
+                if(result[0] == output[0] && result[1] == output[1]){
+                    console.log("Prection Correct!",prediction_correct);
+                    prediction_correct++;
+                }
+                console.log("\n")
+            }
+            
+           
+            
+            
+            
+            //data.push(obj);
+            //countdData++;
+            
+        }
+        console.log("Winner Correct =",winner_correct);
+        console.log("Prediction Correct =",prediction_correct)
+        //this.writeJson(data ,'./dataset/realLifeTestDepth3');
     }
 
     createRealLifeDataset(){
@@ -129,10 +301,6 @@ class NeuralNetwork{
         let input = [];
         let output = [];
         for(let matchId in this.datasetRealLife){
-            if(matchId != '1190418'){
-                continue;
-            }
-            console.log(matchId);
             obj = {};
             input = [];
             output = [];
@@ -174,105 +342,13 @@ class NeuralNetwork{
         return dataset;
     }
 
-    getTeamRating(teamName){
-        let rating = 0;
-        let matchCount = 0;
-        let count = 0;
-        
-        for(let matchId in this.dataset){
-            for(let teamId in this.dataset[matchId]){
-                if(this.dataset[matchId][teamId]['team_details']['team_name'] == teamName){
-                    if(matchCount >= 28){
-                        //console.log(parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']))
-                        //console.log(this.dataset[matchId][teamId]['team_details']['team_rating']);
-                        rating += parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating'])
-                        count++
-                    }
-                    matchCount++;
-                   
-                }
-            }
-            
-        }
-        //console.log(rating);
-        if(count > 0){
-            return (rating/count)/10;
-        }else{
-            return 0.6
-        }
+    
 
-    }
-
-    getPlayerRating(playerName){
-        let depth = 10;
-        // console.log(this.dataset[1190174])
-        let rating = 0;
-        let count = 0;
-        let arr = [];
-        let matchCount = 0;
-        for(let matchId in this.dataset){
-            for(let teamId in this.dataset[matchId]){
-                for(let teamData in this.dataset[matchId][teamId]){
-                    if(teamData == 'Player_stats'){
-                        for(let player in this.dataset[matchId][teamId][teamData]){
-                            if(player == playerName){
-                                for(let playerData in this.dataset[matchId][teamId][teamData][player]){
-                                    if(playerData == 'player_details'){
-                                        for(let stat in this.dataset[matchId][teamId][teamData][player][playerData]){
-                                            if(stat == 'player_rating'){
-                                                let prate = parseFloat(this.dataset[matchId][teamId][teamData][player][playerData][stat]);
-                                                if(prate != 0){
-                                                    arr.push(prate);
-                                                    rating += prate
-                                                    count++;
-                                                }
-                                                
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //console.log(arr);
-        let i;
-        if(arr.length >= depth){
-            i = arr.length-depth;
-        }else{
-            i = 1;
-        }
-
-        let output = 0;
-
-        if(count == 0){
-            this.emptyPlayer += 1;
-            return 0.6;
-        }
-        if(i != 0){
-            for(i ; i <arr.length;i++){
-                output+=arr[i];
-                matchCount++;
-            }
-        }else{
-            output = 0;
-        }
-       
-        //console.log(output)
-        if(output != 0){
-            return (output/matchCount)/10;
-        }else{
-            return 0.6
-            this.emptyPlayer += 1;
-        }
-
-    }
+    
 
     prepareData(type , encodingType){
         this.dataset = JSON.parse(fs.readFileSync('./dataset/dataset.json'));
-        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/datasetRealLife.json'))
+        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/realLifeTest.json'))
         if(type == 1){
             this.trainingData = fs.readFileSync('./dataset/inputTestPlayerOnly.json');
             this.validData = fs.readFileSync('./dataset/validTestPlayerOnly.json');
@@ -331,7 +407,7 @@ class NeuralNetwork{
             rate: 0.0001,
             
         }
-        this.network.train(input,opt,propagate, false);
+        this.network.train(input,opt,propagate, true);
         console.log("--------------\n")
     }
 
@@ -385,8 +461,8 @@ class NeuralNetwork{
 
     }
 
-    predict(feature){
-        console.log(this.network.activate(feature , false));
+    predict(input , output){
+        return this.network.activate(input , false);
     }
 
    
