@@ -5,66 +5,211 @@ const fs = require("fs");
 class NeuralNetwork{
 
     constructor(node_json , conn_json , type , encodingType){
-        this.depth = 5;
+        //prepare the data
         this.prepareData(type , encodingType);
-        this.build(node_json , conn_json);
-        // this.valid();
-        // this.backprop(100000);
-        // this.valid();        
-        // this.save("test3-config1--afterBackprop");
-        //this.functoba();
-        //this.valid(this.datasetRealLife);
-        //this.valid();
-        // for(let i = 0 ; i < 1000 ; i++){
-        //     this.valid(this.datasetRealLife);
-        //     this.backprop(1000);
-        //     this.valid(this.datasetRealLife);
-        // }
-        
-        //this.datasetSortMatchId();
-        //this.functoba();
-        //this.checkDate();
-        //this.createDataset();
-        //this.valid();
-        //this.sortDataset('./dataset/season1718.json','./dataset/season1718Sorted.json')
-        //this.checkDate('./dataset/season1718Sorted.json')
-        // console.log(this.labelEncode("GK"))
-        this.createRatingText();
+        //build the network
+        this.network = this.build(node_json,conn_json)
     }
 
-    createRatingText(){
+    prepareData(type , encodingType){
+        this.depth = 5;
+        this.dataset = JSON.parse(fs.readFileSync('./dataset/season1718Sorted.json'));
+        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/realLifeTest.json'))
+        if(type == 1){
+            this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputTestPlayerOnly.json'));
+            this.validData = JSON.parse(fs.readFileSync('./dataset/validTestPlayerOnly.json'));
+        }else if(type == 2){
+            this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputTestWithTeam.json'));
+            this.validData = JSON.parse(fs.readFileSync('./dataset/validTestWithTeam.json'));
+        }else if(type == 3){
+            if(encodingType == 'label'){
+                this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputTestWithTeamAndPosLabel.json'));
+                this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosLabel.json');
+
+            }else if(encodingType == 'oneHot'){
+                this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputTestWithTeamAndPosOneHot.json'));
+                this.validData = JSON.parse(fs.readFileSync('./dataset/validTestWithTeamAndPosOneHot.json'));
+            }else if(encodingType == 'binary'){
+                this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputTestWithTeamAndPosBinary.json'));
+                this.validData = JSON.parse(fs.readFileSync('./dataset/validTestWithTeamAndPosBinary.json'));
+            }   
+        }else if(type == 4){
+            //type 4 is rating predictor network
+            this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputRatingDataset.json'));
+            this.validData = JSON.parse(fs.readFileSync('./dataset/validRatingDataset.json'));
+        }
+    }
+
+    build(node_json , conn_json){
+        // Get node_data from file
+        let contents = fs.readFileSync(node_json);
+        // Define to JSON type
+        this.node_data = JSON.parse(contents);
+        
+
+        //count total nodes
+        this.node_count = 0;
+        for(let i in this.node_data){
+            this.node_count++;
+        }
+        
+        
+        //define node object based on node_data 
+        this.nodes = Array(this.node_count);
+        for(let i = 0 ; i < this.nodes.length ; i++){
+            //console.log(this.node_data[i].key)
+            this.nodes[i] = new Node(this.node_data[i].type , this.node_data[i].key , this.node_data[i].bias)
+        }
+
+
+        // Get conn_data from file
+        contents = fs.readFileSync(conn_json);
+        // Define to JSON type
+        this.conn_data = JSON.parse(contents);
+        
+
+        //connect node object to another node object based on conn_data
+        for(let i in this.conn_data){
+            for(let j = 0 ; j < this.nodes.length ; j++){
+                if(this.conn_data[i].from == this.nodes[j].key){
+                    for(let h = 0 ; h < this.nodes.length ; h++){
+                        if(this.conn_data[i].to == this.nodes[h].key){
+                            if(j != h){
+                                this.nodes[j].connect(this.nodes[h] , this.conn_data[i].weight);
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        return architect.Construct(this.nodes);
+    }
+
+    backprop(iteration,learningRate,dataset){
+        //the dataset must be parsed first!
+        console.log("Training....\n")
+        let propagate = true;
+        let input;
+        if(dataset == undefined){
+            input = this.trainingData;
+        }else{
+            input = dataset;
+        }
+        
+        let opt = {
+            log: 1000,
+            error: 0,
+            iterations: iteration,
+            rate: learningRate,
+            
+        }
+        let res = this.network.train(input,opt,propagate);
+        console.log("--------------\n");
+        return res;
+    }
+
+    valid(dataset){
+        console.log("Validating....\n");
+        let input;
+        if(dataset == undefined){
+            input = this.validData;
+        }else{
+            input = dataset;
+        }
+        let propagate = false;
+        let opt = {
+            log: 1,
+            error: 0,
+            iterations: 1,
+            rate: 0.0001,
+        }
+        this.network.train(input,opt,propagate, true);
+        console.log("--------------\n")
+    }
+
+    // constructor(node_json , conn_json , type , encodingType){
+    //     this.depth = 5;
+    //     this.prepareData(type , encodingType);
+    //     this.netwrok = this.build(node_json , conn_json);
+    //     // this.backprop(this.netwrok,1000,this.trainingData);
+    //     // this.valid(this.netwrok)
+    //     this.ratingNetwork = this.build('./config/rating-config1-node_data.json', './config/rating-config1-conn_data.json');
+    //     this.validRating = JSON.parse(fs.readFileSync('./dataset/validRatingDataset.json'));
+        
+    //     this.backprop(this.ratingNetwork,10000,fs.readFileSync('./dataset/inputRatingDataset.json'))
+    //     this.valid(this.ratingNetwork, this.validRating)
+    //     // this.valid();
+    //     // this.backprop(100000);
+    //     // this.valid();        
+    //     // this.save("test3-config1--afterBackprop");
+    //     //this.functoba();
+    //     //this.valid(this.datasetRealLife);
+    //     //this.valid();
+    //     // for(let i = 0 ; i < 1000 ; i++){
+    //     //     this.valid(this.datasetRealLife);
+    //     //     this.backprop(1000);
+    //     //     this.valid(this.datasetRealLife);
+    //     // }
+        
+    //     //this.datasetSortMatchId();
+    //     //this.functoba();
+    //     //this.checkDate();
+    //     //this.createDataset();
+    //     //this.valid();
+    //     //this.sortDataset('./dataset/season1718.json','./dataset/season1718Sorted.json')
+    //     //this.checkDate('./dataset/season1718Sorted.json')
+    //     // console.log(this.labelEncode("GK"))
+    //     //this.createRatingText();
+    //     //this.convertDatasetBETA();
+    // }
+
+    convertDatasetBETA(){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/rating1415.json'));
+        let arr = [];
+        for(let id in dataset){
+            let obj = {};
+            obj['input'] = dataset[id]['input'];
+            obj['output'] = dataset[id]['output'];
+            arr.push(obj);
+        }
+        dataset = JSON.parse(fs.readFileSync('./dataset/rating1516.json'));
+        for(let id in dataset){
+            let obj = {};
+            obj['input'] = dataset[id]['input'];
+            obj['output'] = dataset[id]['output'];
+            arr.push(obj);
+        }
+        dataset = JSON.parse(fs.readFileSync('./dataset/rating1617.json'));
+        for(let id in dataset){
+            let obj = {};
+            obj['input'] = dataset[id]['input'];
+            obj['output'] = dataset[id]['output'];
+            arr.push(obj);
+        }
+        this.writeJson(arr,'./dataset/inputRatingDataset.json');
+        arr = [];
+        dataset = JSON.parse(fs.readFileSync('./dataset/rating1718.json'));
+        for(let id in dataset){
+            let obj = {};
+            obj['input'] = dataset[id]['input'];
+            obj['output'] = dataset[id]['output'];
+            arr.push(obj);
+        }
+        this.writeJson(arr,'./dataset/validRatingDataset.json');
+        
+        
+    }
+
+    createRatingTextBETA(){
         let dataset = JSON.parse(fs.readFileSync('./dataset/rating1415.json'));
         for(let id in dataset){
             console.log(id);
         }
     }
 
-    prepareData(type , encodingType){
-        this.dataset = JSON.parse(fs.readFileSync('./dataset/season1718Sorted.json'));
-        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/realLifeTest.json'))
-        // if(type == 1){
-        //     this.trainingData = fs.readFileSync('./dataset/inputTestPlayerOnly.json');
-        //     this.validData = fs.readFileSync('./dataset/validTestPlayerOnly.json');
-        // }else if(type == 2){
-        //     this.trainingData = fs.readFileSync('./dataset/inputTestWithTeam.json');
-        //     this.validData = fs.readFileSync('./dataset/validTestWithTeam.json');
-        // }else if(type == 3){
-        //     if(encodingType == 'label'){
-        //         this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosLabel.json');
-        //         this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosLabel.json');
-
-        //     }else if(encodingType == 'oneHot'){
-        //         this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosOneHot.json');
-        //         this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosOneHot.json');
-        //     }else if(encodingType == 'binary'){
-        //         this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosBinary.json');
-        //         this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosBinary.json');
-        //     }
-            
-        // }else{
-        //     console.log("unknown type");
-        // }   
-    }
+    
 
     labelEncode(playerPos){
         let pos = ["GK","DC","DR","DL","DMC","ML","MR","MC","FW","AMC","AMR","AML","FWL","FWR","DMR","DML"];
@@ -562,93 +707,9 @@ class NeuralNetwork{
 
 
 
-    backprop(iteration){
-        console.log("Training....\n")
-        let propagate = true;
-        let input = JSON.parse(this.trainingData)
-        let opt = {
-            log: 1000,
-            error: 0,
-            iterations: iteration,
-            rate: 0.0001,
-            
-        }
-        let res = this.network.train(input,opt,propagate);
-        console.log("--------------\n");
-        return res;
+ 
 
-
-    }
-
-    valid(dataset){
-        console.log("Validating....\n");
-        let input;
-        if(dataset == undefined){
-            input = JSON.parse(this.validData);
-        }else{
-            input = dataset;
-        }
-        let propagate = false;
-        let opt = {
-            log: 1,
-            error: 0,
-            iterations: 1,
-            rate: 0.0001,
-            
-        }
-        this.network.train(input,opt,propagate, true);
-        console.log("--------------\n")
-    }
-
-    build(node_json , conn_json){
-        // Get node_data from file
-        let contents = fs.readFileSync(node_json);
-        // Define to JSON type
-        this.node_data = JSON.parse(contents);
-        
-
-        //count total nodes
-        this.node_count = 0;
-        for(let i in this.node_data){
-            this.node_count++;
-        }
-        
-        
-        //define node object based on node_data 
-        this.nodes = Array(this.node_count);
-        for(let i = 0 ; i < this.nodes.length ; i++){
-            //console.log(this.node_data[i].key)
-            this.nodes[i] = new Node(this.node_data[i].type , this.node_data[i].key , this.node_data[i].bias)
-        }
-
-
-        // Get conn_data from file
-        contents = fs.readFileSync(conn_json);
-        // Define to JSON type
-        this.conn_data = JSON.parse(contents);
-        
-
-        //connect node object to another node object based on conn_data
-        for(let i in this.conn_data){
-            for(let j = 0 ; j < this.nodes.length ; j++){
-                if(this.conn_data[i].from == this.nodes[j].key){
-                    for(let h = 0 ; h < this.nodes.length ; h++){
-                        if(this.conn_data[i].to == this.nodes[h].key){
-                            if(j != h){
-                                this.nodes[j].connect(this.nodes[h] , this.conn_data[i].weight);
-                            }
-                            
-                        }
-                    }
-                }
-            }
-        }
-
-        this.network = architect.Construct(this.nodes);
-        
-                
-
-    }
+    
 
     predict(input , output){
         return this.network.activate(input , false);
