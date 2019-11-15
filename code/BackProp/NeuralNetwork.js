@@ -21,10 +21,156 @@ class NeuralNetwork{
         //     this.valid(this.datasetRealLife);
         // }
         
+        //this.datasetSortMatchId();
         //this.functoba();
-        this.createDataset();
+        //this.checkDate();
+        //this.createDataset();
         //this.valid();
+        //this.sortDataset('./dataset/season1718.json','./dataset/season1718Sorted.json')
+        //this.checkDate('./dataset/season1718Sorted.json')
+        // console.log(this.labelEncode("GK"))
+        this.createRatingText();
+    }
+
+    createRatingText(){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/rating1415.json'));
+        for(let id in dataset){
+            console.log(id);
+        }
+    }
+
+    prepareData(type , encodingType){
+        this.dataset = JSON.parse(fs.readFileSync('./dataset/season1718Sorted.json'));
+        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/realLifeTest.json'))
+        // if(type == 1){
+        //     this.trainingData = fs.readFileSync('./dataset/inputTestPlayerOnly.json');
+        //     this.validData = fs.readFileSync('./dataset/validTestPlayerOnly.json');
+        // }else if(type == 2){
+        //     this.trainingData = fs.readFileSync('./dataset/inputTestWithTeam.json');
+        //     this.validData = fs.readFileSync('./dataset/validTestWithTeam.json');
+        // }else if(type == 3){
+        //     if(encodingType == 'label'){
+        //         this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosLabel.json');
+        //         this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosLabel.json');
+
+        //     }else if(encodingType == 'oneHot'){
+        //         this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosOneHot.json');
+        //         this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosOneHot.json');
+        //     }else if(encodingType == 'binary'){
+        //         this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosBinary.json');
+        //         this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosBinary.json');
+        //     }
+            
+        // }else{
+        //     console.log("unknown type");
+        // }   
+    }
+
+    labelEncode(playerPos){
+        let pos = ["GK","DC","DR","DL","DMC","ML","MR","MC","FW","AMC","AMR","AML","FWL","FWR","DMR","DML"];
+        let index = pos.indexOf(playerPos);
+        //console.log(index)
+        return index/15;
+    }
+
+    createRatingDataset(){
+        //let dataset = JSON.parse(fs.readFileSync('./dataset/season1415Sorted.json'));
+        let data = {};
+        let count = 0;
+        for(let matchId in this.dataset){
+            for(let teamId in this.dataset[matchId]){
+                if(this.dataset[matchId][teamId]['team_details']['matchday'] > 10){
+                    let matchday = this.dataset[matchId][teamId]['team_details']['matchday'];
+                    
+                    
+                    for(let player in this.dataset[matchId][teamId]['Player_stats']){
+                        if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
+                            console.log(player);
+                            let output = [];
+                            let input = [];
+                            let playerId = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'];
+                            output.push(parseFloat(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']));
+                            input = this.getRatingData(playerId,matchday);
+                            if(input != false){
+                                data[count] = {};
+                                data[count]['input'] = input;
+                                data[count]['output'] = output;
+                                //console.log(data);
+                                count++;
+                            }
+                            
+                        }
+                        
+                    }
+                }
+
+            }
+        }
         
+        this.writeJson(data,'./dataset/rating1718.json');
+
+
+    }
+
+    getRatingData(playerId,matchday){
+        //let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
+        let sum = 0;
+        let count = 0;
+        let rating = 0;
+        let result = [];
+        for(let i = 379 ; i >= 0 ; i--){
+            let matchId = '_'+i;
+            let data = {};
+            let currTeam = 0;
+            let found = false;
+            for(let teamId in this.dataset[matchId]){
+                if(this.dataset[matchId][teamId]['team_details']['matchday'] < matchday){
+                    for(let player in this.dataset[matchId][teamId]['Player_stats']){
+                        if(playerId == this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'] && this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
+                            found = teamId;
+                            data[teamId] = {};
+                            data[teamId]['player_rating'] = parseFloat(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']) / 10;
+                            data[teamId]['team_rating'] = parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']) / 10;
+                            data[teamId]['pos'] =  this.labelEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) /10;
+                            //console.log(this.labelEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']))
+
+                            //console.log(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_name'] , this.dataset[matchId][teamId]['team_details']['matchday'])
+                            //sum+= parseFloat(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']);
+                            //data[currTeam]['player_rating'] = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'];
+                            count++;
+                        }else{
+                            data['enemy'] = {};
+                            //console.log(parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']))
+                            data['enemy']['team_rating'] = parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']) /10;
+                        }
+                    }
+                }
+                currTeam++;
+                
+                
+            }
+            if(found != false){
+                result.push(data[found]['player_rating']);
+                result.push(data[found]['team_rating']);
+                result.push(data[found]['pos']);
+                result.push(data['enemy']['team_rating']);
+            }
+            if(count == this.depth){
+                return result;
+            }
+        }
+
+        return false;
+
+    }
+
+    checkDate(datasetPath){
+        let dataset = JSON.parse(fs.readFileSync(datasetPath));
+        for(let matchId in dataset){
+            for(let teamId in dataset[matchId]){
+                console.log(dataset[matchId][teamId]['team_details']['date']);
+            }
+        }
     }
 
     save(name){
@@ -71,12 +217,21 @@ class NeuralNetwork{
         })
     }
 
-    functoba(){
+    datasetSortMatchId(){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/season1415.json'));
+        for(let matchId in dataset){
+            console.log(matchId);
+        }
+        //this.writeJson(dataset,'./dataset/season1415sorted');
+
+    }
+
+    sortDataset(datasetPath , savePath){
         let matchCount = 0;
         let teamList = [];
         let notIncluded = [];
         let tCount = 0;
-        let datasetRealLife = JSON.parse(fs.readFileSync('./dataset/datasetSorted.json'));
+        let datasetRealLife = JSON.parse(fs.readFileSync(datasetPath));
         let matchDay = {};
 
       
@@ -138,7 +293,7 @@ class NeuralNetwork{
              console.log("\n");
          }
          
-        this.writeJson(datasetRealLife,'./dataset/datasetFinale.json');
+        this.writeJson(datasetRealLife,savePath);
     }
 
     realLifeTest(){
@@ -198,12 +353,68 @@ class NeuralNetwork{
 
     }
 
+    getPlayerRatingBeta(playerId , matchday){
+        let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
+        let sum = 0;
+        let count = 0;
+        let rating = 0;
+        for(let i = 379 ; i >= 0 ; i--){
+            let matchId = '_'+i;
+            let data = {};
+            let currTeam = 0;
+            let found = false;
+            for(let teamId in dataset[matchId]){
+                if(dataset[matchId][teamId]['team_details']['matchday'] < matchday){
+                    for(let player in dataset[matchId][teamId]['Player_stats']){
+                        if(playerId == dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'] && dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
+                            found = teamId;
+                            data[teamId] = {};
+                            data[teamId]['player_rating'] = parseFloat(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']);
+                            data[teamId]['team_rating'] = parseFloat(dataset[matchId][teamId]['team_details']['team_rating']); 
+
+                            //console.log(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_name'] , dataset[matchId][teamId]['team_details']['matchday'])
+                            //sum+= parseFloat(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']);
+                            //data[currTeam]['player_rating'] = dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'];
+                            count++;
+                        }else{
+                            data['enemy'] = {};
+                            //console.log(parseFloat(dataset[matchId][teamId]['team_details']['team_rating']))
+                            data['enemy']['team_rating'] = parseFloat(dataset[matchId][teamId]['team_details']['team_rating']);
+                        }
+                    }
+                }
+                currTeam++;
+                
+                
+            }
+            if(found != false){
+                rating += data[found]['player_rating'] * data[found]['team_rating'] / data['enemy']['team_rating']
+                console.log(data);
+                //console.log("rating = ", data[found]['player_rating'] * data['enemy']['team_rating']/data[found]['team_rating'])
+            }
+            if(count == this.depth){
+                return (rating/count)/10;
+            }
+        }
+
+        if(count == 0){
+            return 0.6
+        }else{
+            return (rating/count)/10;
+        }
+        
+
+    }
+
     createDataset(){
+        this.getPlayerRatingBeta(37204,10)
+        return;
         let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
         let input = [];
         let output = [];
         let obj = {};
         let data = [];
+        let count = 0;
         let winner_correct = 0;
         let prediction_correct = 0;
         for(let matchId in dataset){
@@ -220,7 +431,7 @@ class NeuralNetwork{
                     console.log(dataset[matchId][teamId]['team_details']['team_name']);
                     if(home){
                         let teamRating = this.getTeamRating(team,matchday);
-                        teamRating += 0.05;
+                        //teamRating += 0.05;
                         input.push(teamRating);
                     }else{
                         input.push(this.getTeamRating(team,matchday));
@@ -238,7 +449,7 @@ class NeuralNetwork{
                         if(dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
                             let playerId = dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'];
                             if(home){
-                                let rating = this.getPlayerRating(playerId,matchday);
+                                let rating = this.getPlayerRatingBeta(playerId,matchday);
                                 //rating += 0.05;
                                 input.push(rating);
                             }else{
@@ -264,19 +475,26 @@ class NeuralNetwork{
                 result[1] = Math.round(result[1]);
                 console.log("result =",result,"real = ",output,"\n");
                 if(result[0] > result[1] && output[0] > output[1]){
-                    console.log("Winner Correct !",winner_correct);
                     winner_correct++;
+                    console.log("Winner Correct !",winner_correct);
+                   
                 }else if(result[0] == result[1] && output[0] == output[1]){
-                    console.log("Winner Correct !",winner_correct);
                     winner_correct++;
+                    console.log("Winner Correct !",winner_correct);
+                    
                 }else if(result[0] < result[1] && output[0] < output[1]){
-                    console.log("Winner Correct !",winner_correct);
                     winner_correct++;
+                    console.log("Winner Correct !",winner_correct);
+                   
                 }
                 if(result[0] == output[0] && result[1] == output[1]){
-                    console.log("Prection Correct!",prediction_correct);
                     prediction_correct++;
+                    console.log("Prection Correct!",prediction_correct);
+                   
                 }
+                count++;
+                console.log("winner accuracy = ", winner_correct/count * 100)
+                console.log("score accuracy = ", prediction_correct/count * 100)
                 console.log("\n")
             }
             
@@ -342,36 +560,7 @@ class NeuralNetwork{
         return dataset;
     }
 
-    
 
-    
-
-    prepareData(type , encodingType){
-        this.dataset = JSON.parse(fs.readFileSync('./dataset/dataset.json'));
-        this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/realLifeTest.json'))
-        if(type == 1){
-            this.trainingData = fs.readFileSync('./dataset/inputTestPlayerOnly.json');
-            this.validData = fs.readFileSync('./dataset/validTestPlayerOnly.json');
-        }else if(type == 2){
-            this.trainingData = fs.readFileSync('./dataset/inputTestWithTeam.json');
-            this.validData = fs.readFileSync('./dataset/validTestWithTeam.json');
-        }else if(type == 3){
-            if(encodingType == 'label'){
-                this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosLabel.json');
-                this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosLabel.json');
-
-            }else if(encodingType == 'oneHot'){
-                this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosOneHot.json');
-                this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosOneHot.json');
-            }else if(encodingType == 'binary'){
-                this.trainingData = fs.readFileSync('./dataset/inputTestWithTeamAndPosBinary.json');
-                this.validData = fs.readFileSync('./dataset/validTestWithTeamAndPosBinary.json');
-            }
-            
-        }else{
-            console.log("unknown type");
-        }   
-    }
 
     backprop(iteration){
         console.log("Training....\n")
