@@ -11,6 +11,22 @@ class NeuralNetwork{
         this.network = this.build(node_json,conn_json)
     }
 
+    test(){
+        let dataset;
+        for(let i = 0 ; i < 3 ; i++){
+            if(i == 0){
+                dataset = JSON.parse(fs.readFileSync('./dataset/rating1415.json'));
+            }else if (i == 2){
+                dataset = JSON.parse(fs.readFileSync('./dataset/rating1516.json'));
+            }else{
+                dataset = JSON.parse(fs.readFileSync('./dataset/rating1617.json'));
+            }
+            for(let i in dataset){
+                console.log(i);
+            }
+        }
+    }
+
     prepareData(type , encodingType){
         this.depth = 5;
         this.dataset = JSON.parse(fs.readFileSync('./dataset/season1718Sorted.json'));
@@ -84,7 +100,7 @@ class NeuralNetwork{
             }
         }
 
-        return architect.Construct(this.nodes);
+        return architect.Construct(this.nodes , 'NEAT');
     }
 
     backprop(iteration,learningRate,dataset){
@@ -99,7 +115,7 @@ class NeuralNetwork{
         }
         
         let opt = {
-            log: 1000,
+            log: 1,
             error: 0,
             iterations: iteration,
             rate: learningRate,
@@ -110,7 +126,7 @@ class NeuralNetwork{
         return res;
     }
 
-    valid(dataset){
+    valid(showOutput,dataset){
         console.log("Validating....\n");
         let input;
         if(dataset == undefined){
@@ -125,7 +141,7 @@ class NeuralNetwork{
             iterations: 1,
             rate: 0.0001,
         }
-        this.network.train(input,opt,propagate, true);
+        this.network.train(input,opt,propagate,showOutput);
         console.log("--------------\n")
     }
 
@@ -223,28 +239,39 @@ class NeuralNetwork{
         let data = {};
         let count = 0;
         for(let matchId in this.dataset){
+            let arr = [];
+            let found = false;
+            for(let teamId in this.dataset[matchId]){
+                arr.push(teamId);
+            }
             for(let teamId in this.dataset[matchId]){
                 if(this.dataset[matchId][teamId]['team_details']['matchday'] > 10){
                     let matchday = this.dataset[matchId][teamId]['team_details']['matchday'];
-                    
-                    
                     for(let player in this.dataset[matchId][teamId]['Player_stats']){
                         if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
-                            console.log(player);
+                            found = teamId;
                             let output = [];
                             let input = [];
                             let playerId = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'];
                             output.push(parseFloat(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']));
                             input = this.getRatingData(playerId,matchday);
                             if(input != false){
+                                console.log(player);
+                                if(arr[0] == found){
+                                    input.push(this.getTeamRating(arr[0],matchday));
+                                    input.push(this.getTeamRating(arr[1],matchday));
+                                }else if(arr[1] == found){
+                                    input.push(this.getTeamRating(arr[1],matchday));
+                                    input.push(this.getTeamRating(arr[0],matchday));
+                                }
                                 data[count] = {};
                                 data[count]['input'] = input;
                                 data[count]['output'] = output;
                                 //console.log(data);
                                 count++;
                             }
-                            
                         }
+                        
                         
                     }
                 }
@@ -258,7 +285,6 @@ class NeuralNetwork{
     }
 
     getRatingData(playerId,matchday){
-        //let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
         let sum = 0;
         let count = 0;
         let rating = 0;
@@ -268,7 +294,9 @@ class NeuralNetwork{
             let data = {};
             let currTeam = 0;
             let found = false;
+            let arrTeam = [];
             for(let teamId in this.dataset[matchId]){
+                arrTeam.push(teamId);
                 if(this.dataset[matchId][teamId]['team_details']['matchday'] < matchday){
                     for(let player in this.dataset[matchId][teamId]['Player_stats']){
                         if(playerId == this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id'] && this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
@@ -278,15 +306,10 @@ class NeuralNetwork{
                             data[teamId]['team_rating'] = parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']) / 10;
                             data[teamId]['pos'] =  this.labelEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) /10;
                             //console.log(this.labelEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']))
-
                             //console.log(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_name'] , this.dataset[matchId][teamId]['team_details']['matchday'])
                             //sum+= parseFloat(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating']);
                             //data[currTeam]['player_rating'] = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'];
                             count++;
-                        }else{
-                            data['enemy'] = {};
-                            //console.log(parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']))
-                            data['enemy']['team_rating'] = parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']) /10;
                         }
                     }
                 }
@@ -295,6 +318,18 @@ class NeuralNetwork{
                 
             }
             if(found != false){
+                data['enemy'] = {};
+                if(arrTeam[0] == found){
+                   
+                    //console.log(parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']))
+                    data['enemy']['team_rating'] = parseFloat(this.dataset[matchId][arrTeam[1]]['team_details']['team_rating']) /10;
+                    
+                }else{
+                    
+                    //console.log(parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']))
+                    data['enemy']['team_rating'] = parseFloat(this.dataset[matchId][arrTeam[0]]['team_details']['team_rating']) /10;
+                }
+                //console.log(data);
                 result.push(data[found]['player_rating']);
                 result.push(data[found]['team_rating']);
                 result.push(data[found]['pos']);
@@ -447,15 +482,14 @@ class NeuralNetwork{
     }
 
     getTeamRating(team , matchday){
-        let dataset = JSON.parse(fs.readFileSync('./dataset/datasetFinale.json'));
         let sum = 0;
         let count = 0;
         for(let i = 379 ; i >= 0 ; i--){
             let matchId = '_'+i;
-            for(let teamId in dataset[matchId]){
-                if(dataset[matchId][teamId]['team_details']['team_id'] == team && dataset[matchId][teamId]['team_details']['matchday'] < matchday){
-                    //console.log(dataset[matchId][teamId]['team_details']['team_rating'] , dataset[matchId][teamId]['team_details']['matchday']);
-                    sum += parseFloat(dataset[matchId][teamId]['team_details']['team_rating']);
+            for(let teamId in this.dataset[matchId]){
+                if(teamId == team && this.dataset[matchId][teamId]['team_details']['matchday'] < matchday){
+                    //console.log(this.dataset[matchId][teamId]['team_details']['team_name'] , this.dataset[matchId][teamId]['team_details']['team_rating']);
+                    sum += parseFloat(this.dataset[matchId][teamId]['team_details']['team_rating']);
                     count++;
                 }
             }
