@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>DeepFootball</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://kit.fontawesome.com/2d82527c86.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Catamaran&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Solway&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/style.css">
+    </head>
+    <body id="home">
+        <nav class="navbar">
+            <div class="container">
+                <h1 class="logo">DeepFootball</h1>
+                <ul class="nav">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#predict">Predict</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <section id='result' class="result-content">
+            <div id='1' class="container-result">  
+                <div class="home-team">
+                    <a  class="btn" onclick="toggleShowTest(this)">
+                            <i class="fas fa-arrow-down"></i>
+                    </a>
+                    <h4>Home Team</h4>
+                </div>
+                <div class="score">
+                    <h2>2 - 0</h2>
+                    <h2>1 - 0</h2>
+                </div>
+                <div class="away-team">
+                    <h4>Away Team</h4>
+                </div>
+                
+            </div>
+            <div class="container-player" id="player-1">
+                <div class="player-details-home">
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                </div>
+                <div></div>
+                <div class="player-details-away">
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                </div>
+            </div>
+
+            <div id='2' class="container-result" >
+                    <div class="home-team">
+                        <a class="btn" onclick="toggleShowTest(this)">
+                            <i class="fas fa-arrow-down"></i>
+                        </a>
+                        <h4>Home Team</h4>
+                    </div>
+                    <div class="score">
+                        <h2>2 - 0</h2>
+                        <h2>1 - 0</h2>
+                    </div>
+                    <div class="away-team">
+                        <h4>Away Team</h4>
+                    </div>
+                    
+            </div>
+            <div class="container-player" id="player-2">
+                <div class="player-details-home">
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                    
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                    
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                </div>
+                <div></div>
+                <div class="player-details-away">
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                   
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+        
+                    <h5 class="player-name">asdas</h5>
+                    <h5 class="player-rating">9.0</h5>
+                </div>
+            </div>
+
+        </section>
+        
+
+
+        <footer>
+            <div class="container">
+                <h4>© 2019 Welly Winata</h4>
+                <div>
+                        <a href="http://twitter.com">
+                            <i class="fab fa-twitter fa-2x"></i>
+                          </a>
+                          <a href="http://facebook.com">
+                            <i class="fab fa-facebook fa-2x"></i>
+                          </a>
+                          <a href="http://instagram.com">
+                            <i class="fab fa-instagram fa-2x"></i>
+                          </a>
+                </div>
+                
+            </div>
+        </footer>
+
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous">
+    </script>
+    <script>
+        $(window).on('load', function() {
+            $.getJSON( "./data/testingResultReal.json", data => {
+                let count = 10;
+                let string = '';
+                for(let i in data){
+                    string += `
+                    <div id='${count}' class="container-result">  
+                        <div class="home-team">
+                            <a  class="btn" onclick="toggleShowTest(this)">
+                                    <i class="fas fa-arrow-down"></i>
+                            </a>
+                            <h4>${data[i]['_Team_Home']}</h4>
+                        </div>
+                        <div class="score">
+                            <h2>${data[i]['_real_result']}</h2>
+                            <h2>${data[i]['_predicted_result']}</h2>
+                        </div>
+                        <div class="away-team">
+                            <h4>${data[i]['_Team_Away']}</h4>
+                        </div>
+                        
+                    </div>
+                    `;
+
+                    string += ` <div class="container-player" id="player-${count}">
+                    <div class="player-details-home">`;
+                    for(let j in data[i]['Home']){
+                        string += `
+                                <h5 class="player-name">${j}</h5>
+                                <h5 class="player-rating">${Math.round(data[i]['Home'][j]*10*100)/100}</h5>   
+                        `
+                    }
+                    string += `</div><div></div>
+                    <div class="player-details-away">`
+
+                    for(let j in data[i]['Away']){
+                        string += `
+                                <h5 class="player-name">${j}</h5>
+                                <h5 class="player-rating">${Math.round(data[i]['Away'][j]*10*100)/100}</h5>   
+                        `
+                    }
+                    string += ` </div></div>`;  
+
+                    count++;
+                    
+                }
+                $("#result").html(string);
+            })
+        });
+
+        function toggleShowTest(element){
+            let id = $(element).parent().parent().attr('id');
+
+            if($("#player-"+id).css('display') == 'none'){
+                $(element).html('<i class="fas fa-arrow-up"></i>')
+                $("#player-"+id).css("display",'grid');
+                $("#player-"+id).css("border-bottom-style",'solid');
+                $("#player-"+id).css("border-width",'1px');
+                $("#player-"+id).css("background-color",'whitesmoke');
+
+                $("#"+id).css("border-bottom-style",'none')
+            }else{
+                $(element).html('<i class="fas fa-arrow-down"></i>');
+                $("#player-"+id).css("display",'none');
+                $("#player-"+id).css("border-bottom-style",'none');
+                $("#"+id).css("border-bottom-style",'solid')
+
+            }
+        }
+
+
+
+    </script>
+    </body>
+</html>

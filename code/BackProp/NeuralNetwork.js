@@ -951,15 +951,20 @@ class NeuralNetwork{
     }
 
     realLifeTestRealRating(showDetails , start){
+        let returnData = [];
         let prediction_correct = 0;
         let score_correct = 0;
         if(start == undefined){
             start = 10;
         }
         for(let matchId in this.dataset){
+            let returnObj = {};
+            returnObj['Home'] = {};
+            returnObj['Away'] = {};
             let input = [];
             let output = [];
             let matchday = 0;
+            let count = 0;
             for(let teamId in this.dataset[matchId]){
                 if(this.dataset[matchId][teamId]['team_details']['matchday'] > start){
                     matchday = this.dataset[matchId][teamId]['team_details']['matchday'];
@@ -975,6 +980,17 @@ class NeuralNetwork{
                     if(showDetails){
                         console.log(teamName , teamRating);    
                     }
+                    if(count == 0){
+                        returnObj['_Team_Home'] = teamName;
+                        returnObj['_Team_Home_Rating'] = teamRating;
+                        
+                    }else{
+                        returnObj['_Team_Away'] = teamName;
+                        returnObj['_Team_Away_Rating'] = teamRating;
+                    }
+                    
+                    
+                   
                     
                     for(let player in this.dataset[matchId][teamId]['Player_stats']){
                         if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
@@ -984,9 +1000,17 @@ class NeuralNetwork{
                             if(showDetails){
                                 console.log(player,rating);
                             }
+                            if(count == 0){
+                                returnObj['Home']['_'+player] = rating;
+                            }else{
+                                returnObj['Away']['_'+player] = rating;
+                            }
+                            
+                            
                             
                         }
                     }
+                    count++;
                     console.log("\n")
                 }
                
@@ -995,6 +1019,9 @@ class NeuralNetwork{
                 let result = this.predict(input);
                 result[0] = Math.round(result[0]);
                 result[1] = Math.round(result[1]);
+                returnObj['_real_result'] = `${output[0]} - ${output[1]}`;
+                returnObj['_predicted_result'] = `${result[0]} - ${result[1]}`;
+                returnData.push(returnObj);
                 console.log("result =",result,"real = ",output);
                 if(result[0] > result[1] && output[0] > output[1]){
                     prediction_correct++;
@@ -1019,6 +1046,7 @@ class NeuralNetwork{
         }
         console.log("Prediction Correct =",prediction_correct)
         console.log("Score Correct =",score_correct)
+        this.writeJson(returnData,'testingResultReal.json')
         
     }
 
