@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>DeepFootball</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://kit.fontawesome.com/2d82527c86.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Catamaran&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Solway&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar">
+            <div class="container">
+                <h1 class="logo"><a href="index.html">DeepFootball</a></h1>
+                <ul class="nav">
+                    <li><a href="test_result.html">Result</a></li>
+                    <li><a href="predict.html">Predict</a></li>
+                </ul>
+            </div>
+    </nav>
+
+    <section class="header">
+        <h1>Predict</h1>
+        <p>Input teams and players ratings<br> These ratings will be feeded into neural network to generate the predicted final score</p>
+    </section>
+
+    <section class="result">
+
+    </section>
+
+    <section class="inputs">
+        <div class="form">
+            <div class="home">
+                    <h2>Home Team</h2>
+                    <input id='team-home' placeholder="Home Team" class='input-team-home' type="number">
+                    <input id='player-home-0' class='input-player' type="number">
+                    <input id='player-home-1' class='input-player' type="number">
+                    <input id='player-home-2' class='input-player' type="number">
+                    <input id='player-home-3' class='input-player' type="number">
+                    <input id='player-home-4' class='input-player' type="number">
+                    <input id='player-home-5' class='input-player' type="number">
+                    <input id='player-home-6' class='input-player' type="number">
+                    <input id='player-home-7' class='input-player' type="number">
+                    <input id='player-home-8' class='input-player' type="number">
+                    <input id='player-home-9' class='input-player' type="number">
+                    <input id='player-home-10' class='input-player' type="number">
+                </div>
+                <div class="away">
+                    <h2>Away Team</h2>
+                    <input id='team-away' placeholder="Away Team" class='input-team-away' type="number">
+                    <input id='player-away-0' class='input-player' type="number">
+                    <input id='player-away-1' class='input-player' type="number">
+                    <input id='player-away-2' class='input-player' type="number">
+                    <input id='player-away-3' class='input-player' type="number">
+                    <input id='player-away-4' class='input-player' type="number">
+                    <input id='player-away-5' class='input-player' type="number">
+                    <input id='player-away-6' class='input-player' type="number">
+                    <input id='player-away-7' class='input-player' type="number">
+                    <input id='player-away-8' class='input-player' type="number">
+                    <input id='player-away-9' class='input-player' type="number">
+                    <input id='player-away-10' class='input-player' type="number">
+                </div>
+        </div>
+        <button class="btn-danger" onclick="clearInput()">Clear</button>
+        <button class="btn" onclick="predict()">Predict</button>
+    </section>
+   
+
+    <footer>
+            <div class="container">
+                <h4>© 2019 Welly Winata</h4>
+                <div>
+                        <a href="http://twitter.com">
+                            <i class="fab fa-twitter fa-2x"></i>
+                          </a>
+                          <a href="http://facebook.com">
+                            <i class="fab fa-facebook fa-2x"></i>
+                          </a>
+                          <a href="http://instagram.com">
+                            <i class="fab fa-instagram fa-2x"></i>
+                          </a>
+                </div>
+                
+            </div>
+    </footer>
+
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous">
+    </script>
+
+    <script>
+        function predict(){
+            let data = {};
+            if($("#team-home").val() != ''){
+                data['teamHome'] = $("#team-home").val();
+            }else{
+                alert("KOSONG !");
+                return;
+            }
+
+            for(let i = 0 ; i < 11 ; i++){
+                if($("#player-home-"+i).val() != ''){
+                    data['playerHome'+i] = $("#player-home-"+i).val();
+                }else{
+                    alert("KOSONG !");
+                    return;
+                }
+                
+            }
+
+            if($("#team-away").val() != ''){
+                data['teamAway'] = $("#team-away").val();
+            }
+            else{
+                alert("KOSONG !");
+                return;
+            }
+
+            for(let i = 0 ; i < 11 ; i++){
+                if($("#player-away-"+i).val() != ''){
+                    data['playerAway'+i] = $("#player-away-"+i).val();
+                }else{
+                    alert("KOSONG !");
+                    return;
+                }
+                
+            }
+            
+            console.log(data);
+
+            $.post( "http://localhost:3000/predict" , data).done((data)=>{
+                let result = `${data[0]} - ${data[1]}`;
+                $(".result").html(`<h2>${result}</h2>`)
+            })
+            
+        }
+
+        function clearInput(){
+            $(".result").html('');
+            $("#team-home").val('');
+            $("#team-away").val('');
+            for(let i = 0 ; i < 11 ; i++){
+                $("#player-home-"+i).val('');
+                $("#player-away-"+i).val('');
+            }
+        }
+
+    </script>
+    
+</body>
+</html>

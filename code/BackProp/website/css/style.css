@@ -15,7 +15,7 @@ body{
     line-height: 1.6;
     color: var(--text-color);
     font-size: 1.1 rem;
-    background-color:rgba(1, 2, 4, 0.81);
+    background-color:whitesmoke;
 }
 
 h1,h2,h3,h4 {
@@ -94,6 +94,7 @@ img{
     font-size: 1.5rem;
 }
 
+
 .info .container{
     font-family: 'Solway',sans-serif;
     padding-top: 2rem;
@@ -127,21 +128,7 @@ img{
 
 }
 
-.btn{
-    display: inline-block;
-    color: black;
-    padding: 0.8rem 1.5rem;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    border-radius: 30px;
-    transition: 0.3s;
-}
 
-.btn:hover{
-    color: white;
-    background: rgba(1, 2, 4, 0.81);
-}
 
 
 
@@ -224,6 +211,116 @@ footer a{
     justify-items: center;
 }
 
+.header{
+    padding-top: 1rem;
+    font-size: 3rem;
+    background-color: whitesmoke;
+    color: rgba(1, 2, 4, 0.81);
+    text-align: center;
+    padding-bottom: 2rem;
+}
+
+
+
+.header p{
+    padding-top:0.1rem;
+    margin:auto;
+    font-size: 1.5rem;
+    width: 70%;
+    line-height: 1.2;
+}
+
+.header a{
+    color: rgba(1, 2, 4, 0.81);
+}
+
+
+.inputs .form{
+    background-color: whitesmoke;
+    color:rgba(1, 2, 4, 0.81);
+    width: 20%;
+    display: grid;
+    margin:auto;
+    grid-template-columns: repeat(2,1fr);
+    align-items: center;
+    padding-bottom: 2rem;
+}
+
+.inputs{
+    text-align: center;
+}
+
+.inputs input{
+    display: block;
+}
+
+.home{
+    justify-self: flex-start;
+}
+
+.form h2{
+    margin-bottom: 0.5rem;
+}
+
+.away{
+    justify-self: flex-end;
+}
+
+input{
+    font-size: 1.1rem;
+    width: 120px;
+}
+
+
+.input-team-home{
+    margin:auto;
+  
+    height: 30px;
+    border: 2px solid green;
+    border-radius: 4px;
+    margin-bottom:10px;
+}
+
+.input-player{
+    margin:auto;
+    height: 30px;
+    border: 2px solid black;
+    border-radius: 4px;
+    margin-bottom:10px;
+
+}
+
+.input-team-away{
+    margin:auto;
+    
+    height: 30px;
+    border: 2px solid red;
+    border-radius: 4px;
+    margin-bottom:10px;
+}
+
+.inputs button{
+    height: 50px;
+    width: 100px;
+    margin-bottom: 3rem;
+}
+
+.result{
+    width: 25%;
+    background-color: grey;
+    color:rgba(1, 2, 4, 0.81);
+    text-align: center;
+    align-items: center;
+    margin:auto;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+}
+
+
+
+
+
+
 
 
 /* .player-details-home h5{
@@ -241,6 +338,38 @@ footer a{
 
 
 
+/* Utilities */
+.btn{
+    display: inline-block;
+    color: black;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.btn:hover{
+    color: white;
+    background: rgba(1, 2, 4, 0.81);
+}
+
+.btn-danger{
+    display: inline-block;
+    color: red;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.btn-danger:hover{
+    color: white;
+    background: red;
+}
 
 
 

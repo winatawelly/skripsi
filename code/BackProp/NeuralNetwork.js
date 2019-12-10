@@ -958,6 +958,9 @@ class NeuralNetwork{
             start = 10;
         }
         for(let matchId in this.dataset){
+            if(matchId != '_19'){
+                continue;
+            }
             let returnObj = {};
             returnObj['Home'] = {};
             returnObj['Away'] = {};
@@ -1016,6 +1019,7 @@ class NeuralNetwork{
                
             }
             if(matchday > start){
+                console.log(input)
                 let result = this.predict(input);
                 result[0] = Math.round(result[0]);
                 result[1] = Math.round(result[1]);

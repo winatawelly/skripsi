@@ -13,14 +13,19 @@
     </head>
     <body id="home">
         <nav class="navbar">
-            <div class="container">
-                <h1 class="logo">DeepFootball</h1>
-                <ul class="nav">
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#predict">Predict</a></li>
-                </ul>
-            </div>
+                <div class="container">
+                    <h1 class="logo"><a href="index.html">DeepFootball</a></h1>
+                    <ul class="nav">
+                        <li><a href="test_result.html">Result</a></li>
+                        <li><a href="predict.html">Predict</a></li>
+                    </ul>
+                </div>
         </nav>
+
+        <section class="header">
+                <h1>Result</h1>
+                <p>These are the comparison between real and predicted score from English Premier League 17/18<br> For predicted score, teams and players ratings are retrieved from <a href="http://whoscored.com"><i>whoscored.com</i></a></p>
+        </section>
 
         <section id='result' class="result-content">
             <div id='1' class="container-result">  
@@ -132,6 +137,8 @@
     </script>
     <script>
         $(window).on('load', function() {
+
+
             $.getJSON( "./data/testingResultReal.json", data => {
                 let count = 10;
                 let string = '';
@@ -145,8 +152,8 @@
                             <h4>${data[i]['_Team_Home']}</h4>
                         </div>
                         <div class="score">
-                            <h2>${data[i]['_real_result']}</h2>
-                            <h2>${data[i]['_predicted_result']}</h2>
+                            <h2>Real Score<br>${data[i]['_real_result']}</h2>
+                            <h2>Predicted Score<br>${data[i]['_predicted_result']}</h2>
                         </div>
                         <div class="away-team">
                             <h4>${data[i]['_Team_Away']}</h4>
@@ -156,7 +163,9 @@
                     `;
 
                     string += ` <div class="container-player" id="player-${count}">
-                    <div class="player-details-home">`;
+                    <div class="player-details-home">
+                    <h5 class="player-name">${data[i]['_Team_Home']}</h5>
+                    <h5 class="player-rating">${Math.round(data[i]['_Team_Home_Rating']*10*100)/100}</h5>`;
                     for(let j in data[i]['Home']){
                         string += `
                                 <h5 class="player-name">${j}</h5>
@@ -164,12 +173,15 @@
                         `
                     }
                     string += `</div><div></div>
-                    <div class="player-details-away">`
+                    <div class="player-details-away">
+                    <h5 class="player-rating">${Math.round(data[i]['_Team_Away_Rating']*10*100)/100}</h5>
+                    <h5 class="player-name">${data[i]['_Team_Away']}</h5>`
 
                     for(let j in data[i]['Away']){
                         string += `
-                                <h5 class="player-name">${j}</h5>
                                 <h5 class="player-rating">${Math.round(data[i]['Away'][j]*10*100)/100}</h5>   
+                                <h5 class="player-name">${j}</h5>
+                                
                         `
                     }
                     string += ` </div></div>`;  
