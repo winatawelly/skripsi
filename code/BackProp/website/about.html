@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>DeepFootball</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://kit.fontawesome.com/2d82527c86.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Catamaran&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Solway&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/style.css">
+    </head>
+<body>
+    <nav class="navbar">
+            <div class="container">
+                <h1 class="logo"><a href="index.html">DeepFootball</a></h1>
+                <ul class="nav">
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="test_result.html">Result</a></li>
+                    <li><a href="predict.html">Predict</a></li>
+                </ul>
+            </div>
+    </nav>
+
+    <section class="landing-about">
+        <div class="overlay-about">
+            <div class="inner-landing">            
+            </div>
+        </div>
+    </section>
+
+    
+
+    <section class="article">
+        <section class="header">Using Neuroevolution and Backpropagation <br>to predict the outcome of football matches</section>
+        <h1>Requirements</h1>
+        <ul>
+            <li><a href="https://neat-python.readthedocs.io/en/latest/">NEAT-Python</a> (for NEAT)</li>
+            <li><a href="https://wagenaartje.github.io/neataptic/">Neataptic.js</a> (for Backpropagation)</li>
+        </ul>
+
+        <h1>Dataset</h1>
+        <p>English Premier League matches from season 14/15 to 17/18 are used as dataset, Each match contains detailed data such as player ratings, team ratings, player position, and so on. Those matches are retrieved from <a href="https://whoscored.com">whoscored.com</a></p>
+        <h1>What is NEAT</h1>
+        <p>Neuroevolution of Augmenting Topologies, or NEAT for short, is a method developed by Kenneth O. Stanley for evolving arbitrary neural networks. For detailed info about NEAT, click <a href="http://nn.cs.utexas.edu/keyword?stanley:ec02">here</a></p>
+        <h1>NEAT and Backpropagation</h1>
+        <p>The main problem of constructing a neural network is topology. Topology of a neural network refers to the way the neurons are connected, and it is an important factor in network functioning and learning. Unfortunately this is a trial and error process. The designer will usually try many design to see which worked the best.</p>
+        <p>With NEAT, topology of a neural network is no longer a problem. Using evolutionary algorithm, NEAT search for the most optimal design. NEAT also requires a fitness function, which used to determine if one network is better than the other.</p>
+        <p>After NEAT process is completed, the best network produced by NEAT is going to be optimized using Backpropagation.</p>
+        <h1>Experiment</h1>
+        <p>After several NEAT experiments, the best features used to predict the outcome of football matches are player ratings and team ratings with configuration as follows :</p>
+        <img src="./img/configuration.png" alt="">
+        <p>Those features and configuration achieved 80% prediction accuracy (305/380) and 35% score accuracy (136/380).</p>
+        <p>After NEAT process is completed, the next process is Backpropagation. Backpropagation is done with Neataptic.js with configuration as follows:</p>
+        <ul>
+            <li>100.000 Epoch</li>
+            <li>0.0001 Learning Rate</li>
+        </ul>
+        <p>Backpropagation boosted the accuracy of network produced by NEAT from 80% (305/380) to 81% (308/380) on predicition accuracy and from 35% (136/380) to 42% (161 / 380) on score accuracy. <br>Click <a href="test_result.html">here</a> to view to full test result</p>
+        
+
+
+    </section>
+    
+    <footer>
+            <div class="container">
+                <h4>© 2019 Welly Winata</h4>
+                <div>
+                        <a href="http://twitter.com">
+                            <i class="fab fa-twitter fa-2x"></i>
+                          </a>
+                          <a href="http://facebook.com">
+                            <i class="fab fa-facebook fa-2x"></i>
+                          </a>
+                          <a href="http://instagram.com">
+                            <i class="fab fa-instagram fa-2x"></i>
+                          </a>
+                </div>
+                
+            </div>
+        </footer>
+</body>
+</html>
