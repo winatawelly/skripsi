@@ -66,21 +66,21 @@ import json
 ######################################
 
 ## One Hot
-xor_inputs = f=open("inputTestWithPosOneHot.txt","r")
-if(f.mode == 'r'):
-    xor_inputs = eval(f.read())
+# xor_inputs = f=open("inputTestWithPosOneHot.txt","r")
+# if(f.mode == 'r'):
+#     xor_inputs = eval(f.read())
 
-xor_outputs = f=open("outputTest1.txt","r")
-if(f.mode == 'r'):
-    xor_outputs = eval(f.read())
+# xor_outputs = f=open("outputTest1.txt","r")
+# if(f.mode == 'r'):
+#     xor_outputs = eval(f.read())
     
 
-valid_inputs = f=open("validInputWithPosOneHot.txt","r")
-if(f.mode == 'r'):
-    valid_inputs = eval(f.read())  
-valid_outputs = f=open("validOutputTest1.txt","r")
-if(f.mode == 'r'):
-    valid_outputs = eval(f.read())
+# valid_inputs = f=open("validInputWithPosOneHot.txt","r")
+# if(f.mode == 'r'):
+#     valid_inputs = eval(f.read())  
+# valid_outputs = f=open("validOutputTest1.txt","r")
+# if(f.mode == 'r'):
+#     valid_outputs = eval(f.read())
 # ######################################
 
 # ## Binary
@@ -100,6 +100,24 @@ if(f.mode == 'r'):
 # if(f.mode == 'r'):
 #     valid_outputs = eval(f.read())
 # ######################################
+
+## new total encode
+xor_inputs = f=open("newInputTestWithPos2.txt","r")
+if(f.mode == 'r'):
+    xor_inputs = eval(f.read())
+
+xor_outputs = f=open("outputTest1.txt","r")
+if(f.mode == 'r'):
+    xor_outputs = eval(f.read())
+    
+
+valid_inputs = f=open("newValidTestWithPos2.txt","r")
+if(f.mode == 'r'):
+    valid_inputs = eval(f.read())  
+valid_outputs = f=open("validOutputTest1.txt","r")
+if(f.mode == 'r'):
+    valid_outputs = eval(f.read())
+
 
 
 def eval_genomes(genomes, config):
@@ -167,8 +185,8 @@ def run(config_file):
     p = neat.Population(config)
     
     #continue from last checkpoint
-    #p = neat.Checkpointer.restore_checkpoint('test2-result-config3') # BEST SO FAR
-    p = neat.Checkpointer.restore_checkpoint('test3-result-config1')
+    p = neat.Checkpointer.restore_checkpoint('test3-result-config4') # BEST SO FAR
+    #p = neat.Checkpointer.restore_checkpoint('test3-result-config1')
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -187,7 +205,7 @@ def run(config_file):
         # Display the winning genome.
         print('\nBest genome:\n{!s}'.format(winner))
 
-    # Show output of the most fit genome against training data.
+        # Show output of the most fit genome against training data.
         print('\nOutput:')
         winner_net = neat.nn.FeedForwardNetwork.create(winner,config , display=True)
     
@@ -217,7 +235,7 @@ def run(config_file):
         
         node_names = {-1:'A', -2: 'B', 0:'A XOR B'}
 
-        visualize.draw_net(config, winner, view=False, node_names=node_names, name="test3-config1")
+        visualize.draw_net(config, winner, view=False, node_names=node_names, name="test3-config4")
         visualize.plot_stats(stats, ylog=False, view=False)
         visualize.plot_species(stats, view=False)
     
@@ -231,5 +249,5 @@ if __name__ == '__main__':
     # here so that the script will run successfully regardless of the
     # current working directory.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'test3-config1')
+    config_path = os.path.join(local_dir, 'test3-config4')
     run(config_path)

@@ -168,23 +168,38 @@
                     <h5 class="player-name">${data[i]['_Team_Home']}</h5>
                     <h5 class="player-rating">${Math.round(data[i]['_Team_Home_Rating']*10*100)/100}</h5>`;
                     for(let j in data[i]['Home']){
+                        if(j == 'Formation'){
+                            continue;
+                        }
                         string += `
                                 <h5 class="player-name">${j}</h5>
                                 <h5 class="player-rating">${Math.round(data[i]['Home'][j]*10*100)/100}</h5>   
                         `
                     }
+                    string += `
+                                <h5 class="player-name">Formation</h5>
+                                <h5 class="player-rating">${data[i]['Home']['Formation']}</h5>
+                    `
+
                     string += `</div><div></div>
                     <div class="player-details-away">
                     <h5 class="player-rating">${Math.round(data[i]['_Team_Away_Rating']*10*100)/100}</h5>
                     <h5 class="player-name">${data[i]['_Team_Away']}</h5>`
 
                     for(let j in data[i]['Away']){
+                        if(j == 'Formation'){
+                            continue;
+                        }
                         string += `
                                 <h5 class="player-rating">${Math.round(data[i]['Away'][j]*10*100)/100}</h5>   
                                 <h5 class="player-name">${j}</h5>
                                 
                         `
                     }
+                    string += `
+                                <h5 class="player-rating">${data[i]['Away']['Formation']}</h5>
+                                <h5 class="player-name">Formation</h5>      
+                    `
                     string += ` </div></div>`;  
 
                     count++;

@@ -174,7 +174,7 @@ Test 3:
                 - Prediction Accuracy = 122 (32.1%)
                 - Winner Accuracy = 306 (80.5%)
         - Summary :
-            2 newly added parameters slightly improve the result
+            
 
     Config 2:
         - 1000 generations
@@ -196,7 +196,7 @@ Test 3:
                 - Prediction Accuracy = 162 (42.6 %)
                 - Winner Accuracy = 304 (80%)
         - Summary :
-            2 newly added parameters slightly improve the result
+            
 
     Config 3:
         - Same config as Test2-Config3
@@ -218,7 +218,28 @@ Test 3:
                 - Prediction Accuracy = 153 (40.2%)
                 - Winner Accuracy = 299 (78.6%)
         - Summary :
-            2 newly added parameters slightly improve the result
+
+    Config 4:
+        - Same config as Test3-Config3
+        - 5000 generations
+        - Fitness function 2
+        - Total Encoding
+        - Result
+            - Before Backpropagation :
+                - NEAT running time per generation = +- 23.645 sec 
+                - Prediction accuracy = 
+                - Winner accuracy = 
+            - Backpropagation Config :
+                - Epoch = 100.000
+                - Learning Rate = 0.0001
+            - After Backpropagation :
+                - First Epoch Error = 
+                - Last Epoch Error = 
+                - Total Time = 665 sec
+                - Prediction Accuracy = 153 (45.5%)
+                - Winner Accuracy = 310 (81.5%)
+        - Summary :
+            
 
 
 

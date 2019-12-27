@@ -27,6 +27,21 @@ class NeuralNetwork{
         }
     }
 
+    totalEncode(pos){
+        let def = ["DC","DR","DL"]
+        let mid = ["DMC","ML","MR","MC","AMC","AMR","AML","DMR","DML"]
+        let str = ["FW","FWL","FWR"]
+        if(def.includes(pos)){
+            return 'def';
+        }
+        if(mid.includes(pos)){
+            return 'mid';
+        }
+        if(str.includes(pos)){
+            return 'str';
+        }
+    }
+
     prepareData(type , encodingType){
         this.depth = 5;
         this.dataset = JSON.parse(fs    .readFileSync('./dataset/datasetFinale.json'));
@@ -48,6 +63,9 @@ class NeuralNetwork{
             }else if(encodingType == 'binary'){
                 this.trainingData = JSON.parse(fs.readFileSync('./dataset/inputTestWithTeamAndPosBinary.json'));
                 this.validData = JSON.parse(fs.readFileSync('./dataset/validTestWithTeamAndPosBinary.json'));
+            }else if(encodingType == 'totalEncode'){
+                this.trainingData = JSON.parse(fs.readFileSync('./dataset/newInputTotalEncode.json'));
+                this.validData = JSON.parse(fs.readFileSync('./dataset/newValidTotalEncode.json'));
             }   
         }else if(type == 4){
             //type 4 is rating predictor network
@@ -119,6 +137,7 @@ class NeuralNetwork{
             error: 0,
             iterations: iteration,
             rate: learningRate,
+            momentum:0.99
             
         }
         let res = this.network.train(input,opt,propagate);
@@ -958,9 +977,6 @@ class NeuralNetwork{
             start = 10;
         }
         for(let matchId in this.dataset){
-            if(matchId != '_19'){
-                continue;
-            }
             let returnObj = {};
             returnObj['Home'] = {};
             returnObj['Away'] = {};
@@ -969,6 +985,9 @@ class NeuralNetwork{
             let matchday = 0;
             let count = 0;
             for(let teamId in this.dataset[matchId]){
+                let def = 0;
+                let mid = 0;
+                let str = 0;
                 if(this.dataset[matchId][teamId]['team_details']['matchday'] > start){
                     matchday = this.dataset[matchId][teamId]['team_details']['matchday'];
                     let team = this.dataset[matchId][teamId]['team_details']['team_id'];
@@ -999,6 +1018,15 @@ class NeuralNetwork{
                         if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
                             let playerId = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id']
                             let rating = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_rating'] / 10
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'def'){
+                                def++
+                            }
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'mid'){
+                                mid++
+                            }
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'str'){
+                                str++
+                            }
                             input.push(rating);
                             if(showDetails){
                                 console.log(player,rating);
@@ -1012,6 +1040,14 @@ class NeuralNetwork{
                             
                             
                         }
+                    }
+                    input.push(def/10);
+                    input.push(mid/10);
+                    input.push(str/10);
+                    if(count == 0){
+                        returnObj['Home']['Formation'] = def+'-'+mid+'-'+str;
+                    }else{
+                        returnObj['Away']['Formation'] = def+'-'+mid+'-'+str;
                     }
                     count++;
                     console.log("\n")

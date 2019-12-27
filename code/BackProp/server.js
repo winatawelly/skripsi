@@ -5,7 +5,7 @@ const port = 3000
 const fs = require("fs");
 const { Node , Group , architect  , Network} = require('neataptic');
 const NeuralNetwork = require('./NeuralNetwork.js');
-let NN = new NeuralNetwork("./config/test2-config3-afterBackprop-node_data.json" , "./config/test2-config3-afterBackprop-conn_data.json" , 2 );
+let NN = new NeuralNetwork("./config/test3-config4-afterBackpropMomentum-node_data.json" , "./config/test3-config4-afterBackpropMomentum-conn_data.json" , 3, 'totalEncode' );
 
 
 let bodyParser = require('body-parser');
@@ -17,9 +17,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/testingResult', (req, res) => {
-   let data = NN.realLifeTestRealRating(true , 35);
-   res.send(data);
+app.get('/testAPI', (req, res) => {
+   res.send("WORKING !!!");
    
 })
 
@@ -27,12 +26,12 @@ app.post('/predict' , (req,res)=>{
    let data = req.body;
    let ratings = [];
    ratings.push(parseFloat(data['teamHome']) / 10);
-   for(let i = 0 ; i < 11 ; i++){
+   for(let i = 0 ; i < 14 ; i++){
       ratings.push(parseFloat(data['playerHome'+i]) / 10);
    }
 
    ratings.push(parseFloat(data['teamAway']) / 10);
-   for(let i = 0 ; i < 11 ; i++){
+   for(let i = 0 ; i < 14 ; i++){
       ratings.push(parseFloat(data['playerAway'+i]) / 10);
    }
    let reply = NN.predict(ratings);
