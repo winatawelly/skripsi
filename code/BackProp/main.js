@@ -14,6 +14,7 @@ let NN = new NeuralNetwork("./config/test3-config4-afterBackpropMomentum-node_da
 //console.log(NN.totalEncode('DMC'))
 //NN.backprop(30000,0.0000001)
 NN.valid();
+//NN.realLifeTestAverageWeight(true,15)
 //NN.save('test3-config4-afterBackpropMomentum')
 //NN.valid(true);
 //NN.realLifeTestAverageWeight(true);

@@ -43,7 +43,7 @@ class NeuralNetwork{
     }
 
     prepareData(type , encodingType){
-        this.depth = 5;
+        this.depth = 10;
         this.dataset = JSON.parse(fs    .readFileSync('./dataset/datasetFinale.json'));
         this.datasetRealLife = JSON.parse(fs.readFileSync('./dataset/realLifeTest.json'))
         if(type == 1){
@@ -836,6 +836,9 @@ class NeuralNetwork{
             let output = [];
             let matchday = 0;
             for(let teamId in this.dataset[matchId]){
+                let def = 0;
+                let mid = 0;
+                let str = 0;
                 if(this.dataset[matchId][teamId]['team_details']['matchday'] > start){
                     matchday = this.dataset[matchId][teamId]['team_details']['matchday'];
                     let team = this.dataset[matchId][teamId]['team_details']['team_id'];
@@ -855,6 +858,15 @@ class NeuralNetwork{
                         if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
                             let playerId = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id']
                             let rating = this.getPlayerRatingAverage(playerId,matchday);
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'def'){
+                                def++
+                            }
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'mid'){
+                                mid++
+                            }
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'str'){
+                                str++
+                            }
                             input.push(rating);
                             if(showDetails){
                                 console.log(player,rating);
@@ -862,6 +874,9 @@ class NeuralNetwork{
                             
                         }
                     }
+                    input.push(def/10);
+                    input.push(mid/10);
+                    input.push(str/10);
                     console.log("\n")
                 }
                
@@ -908,6 +923,9 @@ class NeuralNetwork{
             let output = [];
             let matchday = 0;
             for(let teamId in this.dataset[matchId]){
+                let def = 0;
+                let mid = 0;
+                let str = 0;
                 if(this.dataset[matchId][teamId]['team_details']['matchday'] > start){
                     matchday = this.dataset[matchId][teamId]['team_details']['matchday'];
                     let team = this.dataset[matchId][teamId]['team_details']['team_id'];
@@ -927,6 +945,15 @@ class NeuralNetwork{
                         if(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info'] != 'Sub'){
                             let playerId = this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_id']
                             let rating = this.getPlayerRatingBeta(playerId,matchday);
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'def'){
+                                def++
+                            }
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'mid'){
+                                mid++
+                            }
+                            if(this.totalEncode(this.dataset[matchId][teamId]['Player_stats'][player]['player_details']['player_position_info']) == 'str'){
+                                str++
+                            }
                             input.push(rating);
                             if(showDetails){
                                 console.log(player,rating);
@@ -934,6 +961,9 @@ class NeuralNetwork{
                             
                         }
                     }
+                    input.push(def/10);
+                    input.push(mid/10);
+                    input.push(str/10);
                     console.log("\n")
                 }
                

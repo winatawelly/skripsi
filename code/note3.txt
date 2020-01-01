@@ -1,4 +1,0 @@
-in this experiment, i made an adjustment in pop size and initial connection to speed the process because unlike test 1 and test 2, the number of parameters used in this experiment is 376 which is exponentially bigger than the previous experiments.
-
-pop size is reduced from 1000 to 700;
-initial connection probability is reduced from 0.7 to 0.5

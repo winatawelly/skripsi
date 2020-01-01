@@ -241,5 +241,19 @@ Test 3:
         - Summary :
             
 
+Real Life Test :
+    last 5 avg:
+        - 124 / 280 Prediction (44)
+        - 28 / 280 Score (10)
+    last 5 avg with normal:
+        - 78 / 280 Prediction (27.8)
+        - 25 / 280 Score (8.9)
+    last 10 avg:
+        - 92 / 230 Prediction (40)
+        - 21 / 230 Prediction (9)
+    last 10 avg with normal:
+        - 63 / 230 Prediction (26.5)
+        - 20 / 230 Prediction (8.6)
+
 
 

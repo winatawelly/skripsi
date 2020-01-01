@@ -1,5 +1,0 @@
-1. calculate the errors
-	Targets - Output 
-2. calculate the hidden errors
-	weight to output * error_output
-
