@@ -1,9 +1,0 @@
-because there is no improvement from test2-config2, i go back to use 1 actv function only, relu. 
-in this test, i bumped the mutation probability from 0.5 to 0.8
-
-this config achieved slightly better improvement from test2-config1
-
-Prediction accuracy = 136 
-Winner accuracy = 305 
-
-
